@@ -1,0 +1,38 @@
+# Stack efimero para las pruebas de Jenkins: MongoDB + API, aislados del stack real.
+# Sin container_name, sin puertos publicados y sin volumenes (se destruye con `down -v`).
+# Credenciales de usar y tirar, solo validas dentro de esta red de CI.
+name: bigdata-ci
+
+services:
+  mongo:
+    image: mongo:7.0
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ci
+      MONGO_INITDB_ROOT_PASSWORD: ci-only
+    command: ["mongod", "--wiredTigerCacheSizeGB", "0.25"]
+    tmpfs:
+      - /data/db
+    mem_limit: 512m
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+  api:
+    image: bigdata-api:ci        # la imagen que ya paso las pruebas unitarias (se construye en el Jenkinsfile)
+    pull_policy: never
+    environment:
+      MONGO_URI: mongodb://ci:ci-only@mongo:27017/?authSource=admin
+      MONGO_DB: pokemon_ci
+    depends_on:
+      mongo:
+        condition: service_healthy
+    mem_limit: 256m
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health', timeout=3)"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 5s

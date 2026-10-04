@@ -1,0 +1,30 @@
+// Crea o actualiza el job del pipeline al arrancar Jenkins (job-as-code, sin pasos manuales).
+// El sufijo .override hace que la imagen sobrescriba la copia en JENKINS_HOME en cada arranque.
+// El parametro BRANCH (por defecto main) permite probar una rama antes de fusionarla: "Build with Parameters".
+// Los pushes del webhook usan el valor por defecto, asi que solo main se construye automaticamente.
+import jenkins.model.Jenkins
+import hudson.model.ParametersDefinitionProperty
+import hudson.model.StringParameterDefinition
+import hudson.plugins.git.GitSCM
+import hudson.plugins.git.BranchSpec
+import org.jenkinsci.plugins.workflow.cps.CpsScmFlowDefinition
+import org.jenkinsci.plugins.workflow.job.WorkflowJob
+import com.cloudbees.jenkins.GitHubPushTrigger
+
+def repoUrl = 'https://github.com/elrios893/pokemon-geo-bigdata.git'
+def jobName = 'pokemon-geo-bigdata'
+def jenkins = Jenkins.get()
+
+def job = jenkins.getItem(jobName)
+def created = (job == null)
+if (created) {
+    job = jenkins.createProject(WorkflowJob, jobName)
+    job.addTrigger(new GitHubPushTrigger())
+}
+def scm = new GitSCM(GitSCM.createRepoList(repoUrl, null), [new BranchSpec('*/${BRANCH}')], null, null, [])
+job.setDefinition(new CpsScmFlowDefinition(scm, 'Jenkinsfile'))
+job.removeProperty(ParametersDefinitionProperty)
+job.addProperty(new ParametersDefinitionProperty(
+    new StringParameterDefinition('BRANCH', 'main', 'Rama a construir. Se prueba cualquier rama, pero solo main se despliega')))
+job.save()
+println "init: job '${jobName}' ${created ? 'creado' : 'actualizado'}"

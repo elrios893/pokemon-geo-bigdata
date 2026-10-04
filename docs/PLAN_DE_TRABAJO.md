@@ -199,7 +199,7 @@ tests/
 | F2 — Ingesta con Dask | 4–5 oct | `feat/ingest` | Catálogo PokeAPI ✅ · descarga por URL (ZIP → NDJSON), muestra de 2 M, limpieza justificada, carga por lotes a MongoDB, índice `2dsphere` · **servicio `ingest` de un solo uso en el compose** para que `docker compose up` cargue los datos sin pasos manuales |
 | F3 — Procesamiento con Spark | 5 oct | `feat/spark` | Agregación por grilla/geohash, identificación de hotspots, comportamiento por hora/día/mes → colecciones `agg_grid`, `agg_hotspots`, `agg_time` |
 | F4 — Consultas geoespaciales + API | 6 oct | `feat/api` | Endpoints: `GET /near` (`$near` por lat/lng/radio), `POST /within` (`$geoWithin`, polígono GeoJSON), `GET /stats/*` (resultados de Spark), `GET /geonear` (`$geoNear`), `GET /health` |
-| F5 — CI/CD completo | 6–7 oct | `feat/ci` | Jenkinsfile con stages: checkout → build → pytest → levantar servicios → pruebas smoke contra la API → deploy (bloqueado si algo falla) |
+| F5 — CI/CD completo | 6–7 oct | `feat/ci` | Jenkinsfile con stages: checkout → validar compose → build → pytest (API 59, ingesta 16) → stack efímero `docker-compose.ci.yml` + pruebas de humo (18) → deploy (solo `main`; bloqueado si algo falla). Los archivos viajan con `docker cp` (el daemon es el del host y no ve el workspace). El deploy promociona la imagen probada (`bigdata-api:ci` → `:latest`) y reutiliza las credenciales del Mongo en ejecución. El job tiene el parámetro `BRANCH` para probar ramas. **Hecho** |
 | F6 — Benchmark Dask vs Spark | 7–8 oct | `feat/benchmark` | Misma operación pesada (agregación por grilla) ejecutada en Dask (2 vs 4 workers) y Spark (1 vs 2 workers); tiempo y memoria medidos y comparados |
 | F7 — Cierre y documentación | 8 oct | `docs/final` | README "desde cero" verificado, informe técnico ≤10 páginas, ensayo de modificación en vivo, tag `v1.0.0` |
 | F8 — *Opcional*: extensión CS:GO | solo si F0–F7 están completas | `feat/csgo` | Adaptador CS:GO (coordenadas normalizadas por mapa), colección `csgo_damage`, `/csgo/near` y `/csgo/stats`; si no alcanza, queda como trabajo futuro |
@@ -276,6 +276,6 @@ Ensayo previo del escenario de "modificación en vivo": agregar un endpoint nuev
 1. **Reportar al docente** (urgente: el enunciado pide hacerlo *antes de empezar*) el dataset Pokémon GO "Catch Them All" y hacer las dos consultas de §2.4.
 2. Antes de F2, correr un perfilado rápido sobre los 4 archivos (rango de fechas, distribución por `source`, coordenadas inválidas, duplicados) para fundamentar las reglas de limpieza con datos reales.
 3. F2: ingesta con Dask, incluyendo un servicio `ingest` de un solo uso en el compose (criterio "un solo comando, sin pasos manuales ocultos").
-4. F5 (anticipar el riesgo): resolver el montaje de volúmenes cuando Jenkins usa el Docker del host por socket, para poder desplegar en la sustentación.
+4. F5 resuelta: el despliegue solo toca el servicio `api` (sin volúmenes con rutas del workspace). Pendiente: ensayar el cambio en vivo (endpoint nuevo → push → Jenkins).
 5. Decidir si se protege `main` (obliga a trabajar siempre por PR).
 6. Citar en README e informe toda fuente ajena (el enunciado trata como copia el código de otros equipos o repositorios públicos sin citar): origen del dataset, PokeAPI, `smee-client` y cualquier fragmento tomado de repositorios, con enlace y licencia.
