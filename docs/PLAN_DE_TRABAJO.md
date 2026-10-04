@@ -147,9 +147,9 @@ tests/
 
 | Fase | Fechas | Rama | Entregable verificable |
 |---|---|---|---|
-| F0 — Setup | 3 oct | `chore/setup` | Repo creado, este plan, `.gitignore`, dataset reportado al docente |
-| F1 — Infraestructura + Jenkins temprano | 3–4 oct | `feat/infra` | `docker-compose.yml` con todos los servicios obligatorios levantando; Jenkinsfile mínimo (checkout + build) disparado por webhook |
-| F2 — Ingesta con Dask | 4 oct | `feat/ingest` | Catálogo PokeAPI (151 ids con caché), descarga por URL (ZIP → NDJSON), muestra de 2 M, limpieza justificada, carga por lotes a MongoDB, índice `2dsphere` creado |
+| F0 — Setup | 3 oct | `chore/setup` | Repo creado, este plan, `.gitignore` ✅ · dataset reportado al docente ⚠️ **PENDIENTE** |
+| F1 — Infraestructura + Jenkins temprano | 3–4 oct | `feat/infra` | ✅ **COMPLETADA (4 oct)**: `docker-compose.yml` con todos los servicios obligatorios levantando; Jenkinsfile mínimo (checkout + validar compose + build) disparado por webhook (PR #1, #2; build #3 automático en verde) |
+| F2 — Ingesta con Dask | 4–5 oct | `feat/ingest` | Catálogo PokeAPI ✅ · descarga por URL (ZIP → NDJSON), muestra de 2 M, limpieza justificada, carga por lotes a MongoDB, índice `2dsphere` · **servicio `ingest` de un solo uso en el compose** para que `docker compose up` cargue los datos sin pasos manuales |
 | F3 — Procesamiento con Spark | 5 oct | `feat/spark` | Agregación por grilla/geohash, identificación de hotspots, comportamiento por hora/día/mes → colecciones `agg_grid`, `agg_hotspots`, `agg_time` |
 | F4 — Consultas geoespaciales + API | 6 oct | `feat/api` | Endpoints: `GET /near` (`$near` por lat/lng/radio), `POST /within` (`$geoWithin`, polígono GeoJSON), `GET /stats/*` (resultados de Spark), `GET /geonear` (`$geoNear`), `GET /health` |
 | F5 — CI/CD completo | 6–7 oct | `feat/ci` | Jenkinsfile con stages: checkout → build → pytest → levantar servicios → pruebas smoke contra la API → deploy (bloqueado si algo falla) |
@@ -226,8 +226,9 @@ Ensayo previo del escenario de "modificación en vivo": agregar un endpoint nuev
 
 ## 14. Próximos pasos inmediatos
 
-1. **Reportar al docente** el dataset Pokémon GO "Catch Them All" y hacer las dos consultas de §2.4.
-2. `git init`, primer commit con este plan y `.gitignore` (excluyendo `.env`, `kaggle.json`, `data/`, el `.docx`) — **solo cuando se decida iniciar el repositorio**.
-3. Crear el repositorio en GitHub, proteger `main` y configurar el webhook hacia Jenkins.
-4. Iniciar la Fase 1: infraestructura Docker Compose + Jenkins mínimo.
-5. Antes de F2, correr un perfilado rápido sobre los 4 archivos (rango de fechas, distribución por `source`, coordenadas inválidas, duplicados) para fundamentar las reglas de limpieza con datos reales.
+1. **Reportar al docente** (urgente: el enunciado pide hacerlo *antes de empezar*) el dataset Pokémon GO "Catch Them All" y hacer las dos consultas de §2.4.
+2. Antes de F2, correr un perfilado rápido sobre los 4 archivos (rango de fechas, distribución por `source`, coordenadas inválidas, duplicados) para fundamentar las reglas de limpieza con datos reales.
+3. F2: ingesta con Dask, incluyendo un servicio `ingest` de un solo uso en el compose (criterio "un solo comando, sin pasos manuales ocultos").
+4. F5 (anticipar el riesgo): resolver el montaje de volúmenes cuando Jenkins usa el Docker del host por socket, para poder desplegar en la sustentación.
+5. Decidir si se protege `main` (obliga a trabajar siempre por PR).
+6. Citar en README e informe toda fuente ajena (el enunciado trata como copia el código de otros equipos o repositorios públicos sin citar): origen del dataset, PokeAPI, `smee-client` y cualquier fragmento tomado de repositorios, con enlace y licencia.
