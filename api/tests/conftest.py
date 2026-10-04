@@ -41,6 +41,12 @@ class FakeCollection:
         self.calls.append(log)
         return FakeCursor(self.docs, log)
 
+    def count_documents(self, flt, **k):
+        if self.error:
+            raise self.error
+        self.calls.append({"count_filter": flt, **k})
+        return 1234
+
     def aggregate(self, pipeline, **k):
         if self.error:
             raise self.error

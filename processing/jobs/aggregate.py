@@ -3,6 +3,7 @@
 Lee la coleccion `spawns` y el catalogo de PokeAPI, y escribe colecciones nuevas:
 
   agg_grid          conteo por celda de grilla (GRID_DEG grados; 0.01 ~ 1.1 km). La suma de `count` = total de documentos.
+                    `puntos_distintos` = coordenadas exactas distintas (separa trafico de cantidad de puntos).
   agg_hotspots      las HOTSPOT_TOP celdas mas densas, con sus 3 especies dominantes (nombre y tipos del catalogo)
   agg_time          conteos por hora local, dia de la semana y fecha local
   agg_species       conteo por especie (nombre, tipos)
@@ -63,9 +64,10 @@ def main():
                                                    F.array("lng_c", "lat_c").alias("coordinates"))))
 
     grid = center(cell.groupBy("cell_id", "cx", "cy")
-                      .agg(F.count("*").alias("count"), F.countDistinct("pokemonId").alias("species")))
+                      .agg(F.count("*").alias("count"), F.countDistinct("pokemonId").alias("species"),
+                           F.countDistinct("lng", "lat").alias("puntos_distintos")))
     grid.cache()
-    write(grid.select(F.col("cell_id").alias("_id"), "cell_id", "count", "species", "location", "lng_c", "lat_c"),
+    write(grid.select(F.col("cell_id").alias("_id"), "cell_id", "count", "species", "puntos_distintos", "location", "lng_c", "lat_c"),
           "agg_grid")
 
     # ---- hotspots: top N celdas + 3 especies dominantes ----
@@ -80,7 +82,7 @@ def main():
               .agg(F.sort_array(F.collect_list(F.struct(F.col("n").alias("count"), "pokemonId", "name", "types")),
                                 asc=False).alias("top_species")))
     hot = top.join(cs, "cell_id")
-    write(hot.select(F.col("rank").alias("_id"), "rank", "cell_id", "count", "species", "location", "top_species"),
+    write(hot.select(F.col("rank").alias("_id"), "rank", "cell_id", "count", "species", "puntos_distintos", "location", "top_species"),
           "agg_hotspots")
 
     # ---- tiempo ----

@@ -47,6 +47,17 @@ def parse_radius(args, default=None):
     return r
 
 
+def parse_flag(args, name):
+    """Parametro booleano opcional: true/false (insensible a mayusculas); ausente = False."""
+    raw = args.get(name)
+    if raw is None or raw == "":
+        return False
+    v = str(raw).lower()
+    if v not in ("true", "false"):
+        raise ValidationError(f"'{name}' debe ser true o false")
+    return v == "true"
+
+
 def parse_limit(args, default=DEFAULT_LIMIT, maximum=MAX_LIMIT):
     raw = args.get("limit")
     if raw is None or raw == "":
