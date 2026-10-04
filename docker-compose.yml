@@ -123,6 +123,25 @@ services:
       - "8082:8081"
     volumes:
       - ./processing:/opt/jobs:ro
+      - ./data:/data:ro      # el benchmark lee el Parquet limpio desde los ejecutores
+    mem_limit: 1536m
+
+  # Segundo worker: el benchmark compara 1 worker (2 nucleos) contra 2 workers (4 nucleos), igual que Dask.
+  spark-worker-2:
+    image: apache/spark:3.5.3
+    container_name: spark-worker-2
+    restart: unless-stopped
+    command: ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.worker.Worker", "spark://spark-master:7077"]
+    environment:
+      SPARK_WORKER_CORES: "2"
+      SPARK_WORKER_MEMORY: "1g"
+    depends_on:
+      - spark-master
+    ports:
+      - "8083:8081"
+    volumes:
+      - ./processing:/opt/jobs:ro
+      - ./data:/data:ro
     mem_limit: 1536m
 
   # ---------- Job de Spark (un solo uso): agregaciones espaciales y temporales ----------
@@ -159,6 +178,47 @@ services:
       - ./processing:/opt/jobs:ro
       - ./data/ivy:/tmp/ivy
     mem_limit: 1024m
+
+  # ---------- Benchmark Dask vs Spark (un solo uso) ----------
+  # Uso: benchmark/run_bench.sh  (ejecuta todas las combinaciones y guarda data/benchmark/results.jsonl)
+  bench-dask:
+    <<: *dask-image
+    profiles: ["bench"]
+    entrypoint: ["python", "/bench/dask_grid.py"]
+    environment:
+      DASK_SCHEDULER: tcp://dask-scheduler:8786
+    volumes:
+      - ./data:/data
+      - ./benchmark:/bench:ro
+    depends_on:
+      - dask-worker-1
+      - dask-worker-2
+    mem_limit: 512m
+
+  bench-spark:
+    image: apache/spark:3.5.3
+    profiles: ["bench"]
+    user: root          # escribe resultados en ./data/benchmark (creado por el contenedor de Dask, que es root)
+    entrypoint: ["sh", "-c"]
+    command:
+      - >-
+        /opt/spark/bin/spark-submit
+        --master spark://spark-master:7077
+        --conf spark.driver.host=$$(hostname -i)
+        --conf spark.driver.bindAddress=0.0.0.0
+        --conf spark.driver.memory=512m
+        /bench/spark_grid.py
+    environment:
+      CORES_MAX: ${CORES_MAX:-2}
+      SIZE_FILES: ${SIZE_FILES:-8}
+    volumes:
+      - ./data:/data
+      - ./benchmark:/bench:ro
+    depends_on:
+      - spark-master
+      - spark-worker
+      - spark-worker-2
+    mem_limit: 768m
 
   # ---------- API Flask ----------
   api:

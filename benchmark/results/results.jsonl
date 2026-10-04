@@ -1,0 +1,60 @@
+{"engine": "dask", "workers": 1, "cores": 2, "files": 2, "rep": 0, "warmup": true, "seconds": 2.069, "cells": 130983, "total": 560006, "species_sum": 342333}
+{"engine": "dask", "workers": 1, "cores": 2, "files": 2, "rep": 1, "warmup": false, "seconds": 1.197, "cells": 130983, "total": 560006, "species_sum": 342333}
+{"engine": "dask", "workers": 1, "cores": 2, "files": 2, "rep": 2, "warmup": false, "seconds": 1.207, "cells": 130983, "total": 560006, "species_sum": 342333}
+{"engine": "dask", "workers": 1, "cores": 2, "files": 2, "rep": 3, "warmup": false, "seconds": 1.16, "cells": 130983, "total": 560006, "species_sum": 342333}
+{"engine": "dask", "workers": 1, "cores": 2, "files": 2, "kind": "memoria", "peak_rss_mb": 234.9, "total": 560006}
+{"engine": "dask", "workers": 1, "cores": 2, "files": 4, "rep": 0, "warmup": true, "seconds": 2.266, "cells": 183086, "total": 1120489, "species_sum": 576656}
+{"engine": "dask", "workers": 1, "cores": 2, "files": 4, "rep": 1, "warmup": false, "seconds": 1.846, "cells": 183086, "total": 1120489, "species_sum": 576656}
+{"engine": "dask", "workers": 1, "cores": 2, "files": 4, "rep": 2, "warmup": false, "seconds": 1.795, "cells": 183086, "total": 1120489, "species_sum": 576656}
+{"engine": "dask", "workers": 1, "cores": 2, "files": 4, "rep": 3, "warmup": false, "seconds": 1.838, "cells": 183086, "total": 1120489, "species_sum": 576656}
+{"engine": "dask", "workers": 1, "cores": 2, "files": 4, "kind": "memoria", "peak_rss_mb": 262.5, "total": 1120489}
+{"engine": "dask", "workers": 1, "cores": 2, "files": 8, "rep": 0, "warmup": true, "seconds": 3.996, "cells": 244738, "total": 2239470, "species_sum": 934321}
+{"engine": "dask", "workers": 1, "cores": 2, "files": 8, "rep": 1, "warmup": false, "seconds": 3.541, "cells": 244738, "total": 2239470, "species_sum": 934321}
+{"engine": "dask", "workers": 1, "cores": 2, "files": 8, "rep": 2, "warmup": false, "seconds": 3.451, "cells": 244738, "total": 2239470, "species_sum": 934321}
+{"engine": "dask", "workers": 1, "cores": 2, "files": 8, "rep": 3, "warmup": false, "seconds": 3.544, "cells": 244738, "total": 2239470, "species_sum": 934321}
+{"engine": "dask", "workers": 1, "cores": 2, "files": 8, "kind": "memoria", "peak_rss_mb": 298.4, "total": 2239470}
+{"engine": "dask", "workers": 2, "cores": 4, "files": 2, "rep": 0, "warmup": true, "seconds": 1.212, "cells": 130983, "total": 560006, "species_sum": 342333}
+{"engine": "dask", "workers": 2, "cores": 4, "files": 2, "rep": 1, "warmup": false, "seconds": 0.891, "cells": 130983, "total": 560006, "species_sum": 342333}
+{"engine": "dask", "workers": 2, "cores": 4, "files": 2, "rep": 2, "warmup": false, "seconds": 0.915, "cells": 130983, "total": 560006, "species_sum": 342333}
+{"engine": "dask", "workers": 2, "cores": 4, "files": 2, "rep": 3, "warmup": false, "seconds": 0.962, "cells": 130983, "total": 560006, "species_sum": 342333}
+{"engine": "dask", "workers": 2, "cores": 4, "files": 2, "kind": "memoria", "peak_rss_mb": 431.8, "total": 560006}
+{"engine": "dask", "workers": 2, "cores": 4, "files": 4, "rep": 0, "warmup": true, "seconds": 1.757, "cells": 183086, "total": 1120489, "species_sum": 576656}
+{"engine": "dask", "workers": 2, "cores": 4, "files": 4, "rep": 1, "warmup": false, "seconds": 1.35, "cells": 183086, "total": 1120489, "species_sum": 576656}
+{"engine": "dask", "workers": 2, "cores": 4, "files": 4, "rep": 2, "warmup": false, "seconds": 1.366, "cells": 183086, "total": 1120489, "species_sum": 576656}
+{"engine": "dask", "workers": 2, "cores": 4, "files": 4, "rep": 3, "warmup": false, "seconds": 1.339, "cells": 183086, "total": 1120489, "species_sum": 576656}
+{"engine": "dask", "workers": 2, "cores": 4, "files": 4, "kind": "memoria", "peak_rss_mb": 480.2, "total": 1120489}
+{"engine": "dask", "workers": 2, "cores": 4, "files": 8, "rep": 0, "warmup": true, "seconds": 2.568, "cells": 244738, "total": 2239470, "species_sum": 934321}
+{"engine": "dask", "workers": 2, "cores": 4, "files": 8, "rep": 1, "warmup": false, "seconds": 2.108, "cells": 244738, "total": 2239470, "species_sum": 934321}
+{"engine": "dask", "workers": 2, "cores": 4, "files": 8, "rep": 2, "warmup": false, "seconds": 2.339, "cells": 244738, "total": 2239470, "species_sum": 934321}
+{"engine": "dask", "workers": 2, "cores": 4, "files": 8, "rep": 3, "warmup": false, "seconds": 2.084, "cells": 244738, "total": 2239470, "species_sum": 934321}
+{"engine": "dask", "workers": 2, "cores": 4, "files": 8, "kind": "memoria", "peak_rss_mb": 536.6, "total": 2239470}
+{"engine": "spark", "workers": 1, "cores": 2, "files": 2, "rep": 0, "warmup": true, "seconds": 9.462, "cells": 130983, "total": 560006, "species_sum": 342333}
+{"engine": "spark", "workers": 1, "cores": 2, "files": 2, "rep": 1, "warmup": false, "seconds": 2.115, "cells": 130983, "total": 560006, "species_sum": 342333}
+{"engine": "spark", "workers": 1, "cores": 2, "files": 2, "rep": 2, "warmup": false, "seconds": 1.879, "cells": 130983, "total": 560006, "species_sum": 342333}
+{"engine": "spark", "workers": 1, "cores": 2, "files": 2, "rep": 3, "warmup": false, "seconds": 1.468, "cells": 130983, "total": 560006, "species_sum": 342333}
+{"engine": "spark", "workers": 1, "cores": 2, "files": 2, "kind": "memoria", "peak_rss_mb": 519.0, "ejecutores": 1, "total": 560006}
+{"engine": "spark", "workers": 1, "cores": 2, "files": 4, "rep": 0, "warmup": true, "seconds": 10.588, "cells": 183086, "total": 1120489, "species_sum": 576656}
+{"engine": "spark", "workers": 1, "cores": 2, "files": 4, "rep": 1, "warmup": false, "seconds": 2.925, "cells": 183086, "total": 1120489, "species_sum": 576656}
+{"engine": "spark", "workers": 1, "cores": 2, "files": 4, "rep": 2, "warmup": false, "seconds": 2.503, "cells": 183086, "total": 1120489, "species_sum": 576656}
+{"engine": "spark", "workers": 1, "cores": 2, "files": 4, "rep": 3, "warmup": false, "seconds": 2.274, "cells": 183086, "total": 1120489, "species_sum": 576656}
+{"engine": "spark", "workers": 1, "cores": 2, "files": 4, "kind": "memoria", "peak_rss_mb": 645.6, "ejecutores": 1, "total": 1120489}
+{"engine": "spark", "workers": 1, "cores": 2, "files": 8, "rep": 0, "warmup": true, "seconds": 11.383, "cells": 244738, "total": 2239470, "species_sum": 934321}
+{"engine": "spark", "workers": 1, "cores": 2, "files": 8, "rep": 1, "warmup": false, "seconds": 4.03, "cells": 244738, "total": 2239470, "species_sum": 934321}
+{"engine": "spark", "workers": 1, "cores": 2, "files": 8, "rep": 2, "warmup": false, "seconds": 4.156, "cells": 244738, "total": 2239470, "species_sum": 934321}
+{"engine": "spark", "workers": 1, "cores": 2, "files": 8, "rep": 3, "warmup": false, "seconds": 3.676, "cells": 244738, "total": 2239470, "species_sum": 934321}
+{"engine": "spark", "workers": 1, "cores": 2, "files": 8, "kind": "memoria", "peak_rss_mb": 682.3, "ejecutores": 1, "total": 2239470}
+{"engine": "spark", "workers": 2, "cores": 4, "files": 2, "rep": 0, "warmup": true, "seconds": 10.725, "cells": 130983, "total": 560006, "species_sum": 342333}
+{"engine": "spark", "workers": 2, "cores": 4, "files": 2, "rep": 1, "warmup": false, "seconds": 2.94, "cells": 130983, "total": 560006, "species_sum": 342333}
+{"engine": "spark", "workers": 2, "cores": 4, "files": 2, "rep": 2, "warmup": false, "seconds": 1.698, "cells": 130983, "total": 560006, "species_sum": 342333}
+{"engine": "spark", "workers": 2, "cores": 4, "files": 2, "rep": 3, "warmup": false, "seconds": 1.902, "cells": 130983, "total": 560006, "species_sum": 342333}
+{"engine": "spark", "workers": 2, "cores": 4, "files": 2, "kind": "memoria", "peak_rss_mb": 955.4, "ejecutores": 2, "total": 560006}
+{"engine": "spark", "workers": 2, "cores": 4, "files": 4, "rep": 0, "warmup": true, "seconds": 12.356, "cells": 183086, "total": 1120489, "species_sum": 576656}
+{"engine": "spark", "workers": 2, "cores": 4, "files": 4, "rep": 1, "warmup": false, "seconds": 3.308, "cells": 183086, "total": 1120489, "species_sum": 576656}
+{"engine": "spark", "workers": 2, "cores": 4, "files": 4, "rep": 2, "warmup": false, "seconds": 3.569, "cells": 183086, "total": 1120489, "species_sum": 576656}
+{"engine": "spark", "workers": 2, "cores": 4, "files": 4, "rep": 3, "warmup": false, "seconds": 2.222, "cells": 183086, "total": 1120489, "species_sum": 576656}
+{"engine": "spark", "workers": 2, "cores": 4, "files": 4, "kind": "memoria", "peak_rss_mb": 1116.1, "ejecutores": 2, "total": 1120489}
+{"engine": "spark", "workers": 2, "cores": 4, "files": 8, "rep": 0, "warmup": true, "seconds": 11.866, "cells": 244738, "total": 2239470, "species_sum": 934321}
+{"engine": "spark", "workers": 2, "cores": 4, "files": 8, "rep": 1, "warmup": false, "seconds": 3.717, "cells": 244738, "total": 2239470, "species_sum": 934321}
+{"engine": "spark", "workers": 2, "cores": 4, "files": 8, "rep": 2, "warmup": false, "seconds": 4.779, "cells": 244738, "total": 2239470, "species_sum": 934321}
+{"engine": "spark", "workers": 2, "cores": 4, "files": 8, "rep": 3, "warmup": false, "seconds": 4.56, "cells": 244738, "total": 2239470, "species_sum": 934321}
+{"engine": "spark", "workers": 2, "cores": 4, "files": 8, "kind": "memoria", "peak_rss_mb": 1239.2, "ejecutores": 2, "total": 2239470}
