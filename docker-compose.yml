@@ -131,6 +131,20 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     mem_limit: 1024m
 
+  # ---------- Puente de webhooks GitHub -> Jenkins local (opcional) ----------
+  # Uso:  docker compose --profile webhook up -d smee   (requiere SMEE_URL en .env)
+  smee:
+    image: node:20-alpine
+    container_name: smee
+    profiles: ["webhook"]
+    restart: unless-stopped
+    environment:
+      SMEE_URL: ${SMEE_URL:-}
+    command: ["sh", "-c", "[ -n \"$$SMEE_URL\" ] || { echo 'Falta SMEE_URL en .env'; exit 1; }; npm install -g smee-client >/dev/null 2>&1 && exec smee --url \"$$SMEE_URL\" --target http://jenkins:8080/github-webhook/"]
+    depends_on:
+      - jenkins
+    mem_limit: 128m
+
 volumes:
   mongo_data:
   jenkins_home:
