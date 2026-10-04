@@ -24,7 +24,7 @@ Construir un sistema completo (no piezas sueltas) que:
 
 ### 2.1 Dataset principal — Pokémon GO "Catch Them All" (estado: definido, pendiente de reportar/confirmar con el docente)
 
-- **Contenido:** avistamientos (spawns) de Pokémon GO con ubicaciones reales de todo el mundo, recolectados en septiembre de 2016 (muestras vistas: 21–25 sep 2016).
+- **Contenido:** avistamientos (spawns) de Pokémon GO con ubicaciones reales de todo el mundo, recolectados de apps de rastreo colaborativo en 2016. Rango real (perfilado, §2.8): **13 jul – 2 oct 2016**, pero ~94 % de las filas caen entre el **21 y el 26 de septiembre**.
 - **Tamaño (verificado localmente):** 4 archivos NDJSON de ~520 MB c/u (~2 GB), **~8,96 M de registros** (2.242.211 + 2.242.111 + 2.242.211 + 2.238.311 líneas).
 - **Formato:** un documento por línea, export de `mongoexport`; la ubicación **ya es GeoJSON**:
   ```json
@@ -32,7 +32,7 @@ Construir un sistema completo (no piezas sueltas) que:
    "pokemonId":134,"_id":{"$oid":"57e27f5d4856fa0012d30faa"},
    "location":{"coordinates":[-73.972765,40.77907],"type":"Point"},"__v":0}
   ```
-- **Campos:** `pokemonId` (1–151), `appearedOn` (UTC), `localTime` (hora local del avistamiento), `source` (POKESNIPER, POKERADAR, …), `location` (Point, `[lng, lat]`), `_id`, `__v`.
+- **Campos:** `pokemonId` (1–151), `appearedOn` (UTC), `localTime` (**no fiable como hora local**, ver §2.8), `source` (POKESNIPER, POKERADAR, …), `location` (Point, `[lng, lat]`), `_id`, `__v`.
 - **Origen y descarga:** los archivos están alojados en Kaggle como adjuntos de un hilo de discusión del dataset *Predict'em All* (`semioniy/predictemall`, discusión 24246), **no** como dataset descargable con la API. Enlaces públicos directos (verificados, HTTP 200, ~225 MB comprimidos en total):
   - part1: `https://storage.googleapis.com/kaggle-forum-message-attachments/138703/5004/catchemall_part1.zip`
   - part2: `https://storage.googleapis.com/kaggle-forum-message-attachments/138703/5006/catchemall_part2.zip`
@@ -40,7 +40,7 @@ Construir un sistema completo (no piezas sueltas) que:
   - part4: `https://storage.googleapis.com/kaggle-forum-message-attachments/138703/5007/catchemall_part4.zip`
 - **Estrategia de ingesta:** el pipeline descarga y descomprime por URL (`requests` en streaming), solo si el archivo no existe en `data/` (caché local, fuera de git). No requiere token. Se documenta en el README y el informe la procedencia (Kaggle, adjuntos del hilo) y la autoría del dataset original, y se registra como desviación frente a "descarga con la API de Kaggle" (ver §2.4).
 - **Variable `SAMPLE_ROWS`:** ver §2.6 (muestra de trabajo de 2.000.000, mínimo exigido 1.000.000).
-- **Particularidades a tratar en la limpieza (§7):** ventana temporal de pocos días (el análisis por mes/año aporta poco; el foco es **hora y día**), posibles duplicados entre fuentes, coordenadas falsas/spoofing o (0,0), fechas en formato extendido de Mongo (`$date`, `$oid`).
+- **Particularidades a tratar en la limpieza (§7):** concentración temporal en pocos días (el análisis por mes/año aporta poco; el foco es **hora y día**), 3.993 filas sin `pokemonId`, duplicados exactos (0,13 %), `localTime` poco fiable y fechas en formato extendido de Mongo (`$date`, `$oid`). Resultados completos del perfilado en §2.8.
 
 ### 2.2 Extensión opcional — CS:GO Competitive Matchmaking Damage (Fase F8)
 
@@ -63,7 +63,7 @@ Construir un sistema completo (no piezas sueltas) que:
 
 - **Motivo:** el dataset completo (~8,96 M) más MongoDB, imágenes Docker y volúmenes no caben cómodamente en el disco del equipo (~8 GB libres) y alarga innecesariamente la ingesta. El enunciado permite trabajar con una muestra de **≥ 1.000.000 de registros** si la descarga completa queda automatizada.
 - **Muestra objetivo:** `SAMPLE_ROWS = 2.000.000` (500.000 por cada parte). Margen de seguridad: tras limpieza y deduplicación deben quedar **≥ 1.000.000** registros; si no, se sube `SAMPLE_ROWS`.
-- **Criterio de muestreo:** primeras N filas de cada parte, porque las partes son cronológicas (part1 ≈ 21 sep … part4 ≈ 25 sep+). Así se conserva la dispersión temporal y geográfica sin cargar todo. El criterio queda documentado y es reproducible (no aleatorio).
+- **Criterio de muestreo:** primeras N filas de cada parte, porque las partes siguen aproximadamente el orden de inserción (el perfilado muestra que cada parte contiene unas pocas filas tempranas de julio, pero el grueso avanza de part1 ≈ 21–22 sep a part4 ≈ 25–26 sep). No son estrictamente cronológicas, pero la muestra cubre 13 jul – 25 sep y conserva la dispersión geográfica (cientos de ciudades) sin cargar todo. El criterio queda documentado y es reproducible (no aleatorio).
 - La descarga y descompresión de los 4 ZIP completos siguen automatizadas; solo la **carga a MongoDB** se limita con `SAMPLE_ROWS` (valor `0` = todo).
 
 ### 2.7 Enriquecimiento con PokeAPI
@@ -73,6 +73,21 @@ Construir un sistema completo (no piezas sueltas) que:
 - **Nunca** se consulta PokeAPI por cada registro ni desde la API Flask en cada petición.
 - El catálogo se carga en MongoDB (`pokemon_catalog`) y se une por `pokemonId`: Spark lo usa para agregar por tipo/especie (p. ej. hotspots de tipo agua) y la API devuelve `name` y `types` junto con cada avistamiento.
 - Si PokeAPI no está disponible al reconstruir el catálogo, el pipeline usa el JSON versionado.
+### 2.8 Resultados del perfilado (4 archivos, 8.964.844 filas, script `ingest/profile_data.py`)
+
+| Aspecto | Hallazgo | Implicación |
+|---|---|---|
+| Formato | 0 JSON inválidos, 0 líneas vacías; solo 2 variantes de claves (la 2.ª sin `pokemonId`: 3.993 filas) | Lectura por líneas segura |
+| Coordenadas | 100 % válidas (rango, tipo, `(0,0)`); lat −54,8 a 68,9; lng −159,8 a 175,3 | El filtro de coordenadas no elimina nada |
+| `_id` | 0 repetidos | No hay solapamiento entre partes |
+| Duplicados por evento | 11.940 (0,133 %); 1.356 en la muestra de 2 M | Deduplicar |
+| Fechas (UTC) | 13 jul – 2 oct 2016; ~94 % entre el 21 y el 26 sep (pico 24 sep: 2,28 M) | Agregar por hora y día; mes/año aporta poco |
+| Fuente (`source`) | POKERADAR 90,6 %; SKIPLAGGED 7,0 %; POKECREW 2,0 %; resto < 0,3 % | Datos de apps colaborativas: sesgo hacia ciudades con muchos usuarios |
+| Geografía | 3.313 celdas de 1°; mayores: Nueva York/Filadelfia, Reino Unido, Toronto, Ámsterdam, Bahía de San Francisco | Hotspots dominados por cobertura de las apps |
+| `pokemonId` | 145 de 151 distintos; ausentes 132 (Ditto), 144–146 (aves legendarias), 150–151 (Mewtwo, Mew) | Esperable: no aparecían como salvajes |
+| `localTime` | Desfases múltiplos de 15 min, pero **no son hora local real** (ver §7, regla 5) | Derivar la hora local de UTC y longitud |
+| Muestra de 2 M | 2.000.000 con coordenadas válidas, 1.356 duplicados; fechas 13 jul – 25 sep | ≈ 1,997 M útiles tras limpiar, por encima del mínimo de 1 M |
+
 ### 2.5 Diseño agnóstico al dataset
 
 La ingesta se parametriza con un archivo de configuración (`config/datasets/<nombre>.yml`): fuente (URL o slug Kaggle), mapeo de columnas → esquema GeoJSON (`id`, `timestamp`, `location`, atributos), bounding box (si aplica) y reglas de limpieza. Añadir o cambiar un dataset no modifica la infraestructura, Jenkins ni la API base.
@@ -160,18 +175,18 @@ tests/
 
 ## 7. Reglas de limpieza (a justificar en el informe)
 
-Aplicables al dataset principal (Pokémon GO); se ajustan por dataset mediante su archivo de configuración (§2.5):
+Basadas en el perfilado de los 4 archivos (§2.8); se ajustan por dataset mediante su archivo de configuración (§2.5). Filas afectadas sobre las 8.964.844 originales:
 
-1. Descartar registros sin `location` o con `coordinates` ausentes/no numéricas.
-2. Filtrar fuera de rango (`|lat| ≤ 90`, `|lng| ≤ 180`) y descartar `(0,0)` (valor típico de error de geocodificación o spoofing).
-3. Aplanar fechas extendidas de Mongo: `appearedOn.$date` → `datetime` UTC; `_id.$oid` → `id` de texto.
-4. Validar `pokemonId` ∈ [1, 151].
-5. Deduplicar por `(pokemonId, coordinates, appearedOn)` (mismo avistamiento reportado por varias fuentes/partes).
-6. Conservar `localTime` para el análisis por hora local, y `source` para comparar fuentes.
-7. Verificar que `location` queda como GeoJSON `Point` válido con orden `[lng, lat]`.
-8. Conservar solo las columnas necesarias para las consultas y agregaciones.
+1. **Coordenadas nulas, no numéricas, fuera de rango (`|lat| ≤ 90`, `|lng| ≤ 180`) o `(0,0)`:** se implementa el filtro, pero el perfilado muestra **0 filas afectadas** (100 % de coordenadas válidas). Se mantiene como defensa y se reporta honestamente que no elimina datos.
+2. **Descartar filas sin `pokemonId`:** **3.993 filas (0,045 %)** no tienen ese campo; sin él no se puede enriquecer ni agregar por especie. También se valida `pokemonId` ∈ [1, 151].
+3. **Deduplicar por `(pokemonId, lng, lat, appearedOn)`:** **11.940 duplicados exactos (0,133 %)**. No hay `_id` repetidos, así que son el mismo evento reportado de nuevo, no un artefacto de las partes.
+4. **Aplanar fechas extendidas de Mongo:** `appearedOn.$date` → `datetime` UTC; `_id.$oid` → `id` de texto.
+5. **No usar `localTime` como hora local:** verificado que no lo es (Nueva York da UTC−5 en vez de UTC−4, California UTC−8 en vez de UTC−7, Reino Unido UTC+0 en vez de +1, Ámsterdam UTC+0 en vez de +2: ignora el horario de verano y en Europa ni acierta la zona). La **hora local se deriva de `appearedOn` (UTC) y la longitud** (aprox. solar, `lng/15` h), decisión documentada en el informe. `source` se conserva para comparar fuentes.
+6. **Verificar** que `location` queda como GeoJSON `Point` válido con orden `[lng, lat]`.
+7. **Conservar solo** las columnas necesarias para las consultas y agregaciones.
 
-Se registra el conteo de filas antes/después de cada regla, para incluirlo en el informe. Cada regla se justifica con una frase y, cuando sea posible, con un conteo real.
+Tamaño esperado tras limpiar: ≈ 8,95 M sobre el conjunto completo y **≈ 1,997 M sobre la muestra de 2 M** (mínimo exigido: 1 M). Se registra el conteo real antes/después de cada regla para el informe.
+
 ## 8. Restricciones
 
 - **Sin secretos en el repo.** Las credenciales de MongoDB viven en `.env` (solo se versiona `.env.example`) y en credenciales de Jenkins (`withCredentials`). El dataset principal se descarga por URL pública y no requiere token; si se usa un dataset descargado con la API de Kaggle (CS:GO, Chicago), su token se guarda como credencial *Secret file* en Jenkins y nunca en el repo.
