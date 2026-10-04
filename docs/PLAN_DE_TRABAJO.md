@@ -88,6 +88,35 @@ Construir un sistema completo (no piezas sueltas) que:
 | `localTime` | Desfases múltiplos de 15 min, pero **no son hora local real** (ver §7, regla 5) | Derivar la hora local de UTC y longitud |
 | Muestra de 2 M | 2.000.000 con coordenadas válidas, 1.356 duplicados; fechas 13 jul – 25 sep | ≈ 1,997 M útiles tras limpiar, por encima del mínimo de 1 M |
 
+### 2.9 Perfilado espacial: puntos de aparición repetidos (script `ingest/profile_spatial.py`)
+
+Se midió sobre la población completa (8.944.697 filas útiles, sin duplicados exactos) y se comparó con dos formas de muestrear ~2 M de filas: las **primeras 500.000 de cada parte** (criterio de §2.6) y **una de cada 4 filas** (muestreo sistemático). Punto = coordenada exacta (redondeada a 1e-6°, ≈ 0,1 m).
+
+| Medida | Completo | Primeras 500 k/parte | Una de cada 4 |
+|---|---|---|---|
+| Avistamientos | 8.944.697 | 1.995.110 | 2.236.173 |
+| Puntos distintos | 3.148.518 | 1.176.511 | 1.301.602 |
+| Avistamientos por punto (media) | 2,84 | 1,70 | 1,72 |
+| % de avistamientos en puntos vistos > 1 vez | **81,2 %** | 57,3 % | 58,0 % |
+| % de puntos vistos una sola vez | 53,4 % | 72,4 % | 72,1 % |
+| Máximo en un solo punto | 277 | 88 | 72 |
+| Días distintos cubiertos | 82 | 75 | 81 |
+| % viernes (UTC) | 7,4 | **0,7** | 7,4 |
+
+Relación entre avistamientos que comparten coordenada (pares consecutivos en el tiempo dentro del mismo punto, población completa, 5,8 M pares):
+
+- **Los puntos son de aparición, no de eventos únicos:** la misma especie se repite en el siguiente avistamiento del punto el 25,1 % de las veces, frente al 5,7 % que habría si la especie fuera independiente del punto (4,4×). Un punto de agua vuelve a dar agua el 66,0 % de las veces (contra 17,5 % global); un punto no de agua, solo el 8,5 %.
+- **Ritmo:** mediana de 4 h entre observaciones del mismo punto; 86 % en menos de 24 h. Con brecha de 1–24 h la especie coincide el 29 %; con ≤ 15 min, 18 %.
+- **Misma fuente:** el 99 % de los pares consecutivos viene de la misma app, es decir, los puntos repetidos reflejan que una app consulta repetidamente la misma zona.
+- **Casi-duplicados reales:** misma especie, mismo punto, ≤ 15 min (un aparecimiento dura como máximo ese tiempo): 95.224 filas en la población (1,07 %); 0,23 % en la muestra sistemática.
+
+**Decisiones**
+
+1. **No se eliminan registros por compartir posición.** Son observaciones distintas (otro momento, a menudo otra especie) y su relación es justamente una propiedad del dataset (persistencia del tipo en cada punto). Borrarlos destruiría la señal que se analiza. Tampoco se añade una regla de ventana de 15 min: afectaría 0,2 % de la muestra.
+2. **El porcentaje de posiciones repetidas no puede "bajarse" con el muestreo:** adelgazar la muestra reduce las coincidencias (57–58 % de avistamientos en puntos repetidos frente a 81 % real) pero no es una propiedad de los datos. Se documenta que la muestra **subestima** la repetición.
+3. **Se cambia el criterio de muestreo de "primeras N filas" a "una de cada K filas"** (`SAMPLE_STRIDE`): conserva la distribución temporal del dataset completo (viernes 7,4 % como en la población, frente a 0,7 % antes) con el mismo tamaño y mismo costo. §2.6 queda reemplazado por este criterio una vez aplicado.
+4. Los hotspots se interpretan junto con el número de **puntos distintos** por celda; `agg_grid` y `agg_hotspots` incorporarán `puntos_distintos` (conteo exacto de coordenadas distintas).
+
 ### 2.5 Diseño agnóstico al dataset
 
 La ingesta se parametriza con un archivo de configuración (`config/datasets/<nombre>.yml`): fuente (URL o slug Kaggle), mapeo de columnas → esquema GeoJSON (`id`, `timestamp`, `location`, atributos), bounding box (si aplica) y reglas de limpieza. Añadir o cambiar un dataset no modifica la infraestructura, Jenkins ni la API base.
