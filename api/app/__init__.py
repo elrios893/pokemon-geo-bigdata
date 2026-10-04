@@ -1,15 +1,21 @@
 import os
 
 from flask import Flask, jsonify
-from pymongo import MongoClient
 
 
-def create_app(mongo_client=None):
+def create_app(db=None):
+    """Fabrica de la app. `db` permite inyectar una base falsa en las pruebas (sin MongoDB)."""
     app = Flask(__name__)
-    client = mongo_client or MongoClient(
-        os.environ["MONGO_URI"], serverSelectionTimeoutMS=3000
-    )
-    app.config["DB"] = client[os.environ.get("MONGO_DB", "pokemon")]
+    app.json.sort_keys = False
+
+    if db is None:
+        from pymongo import MongoClient  # import perezoso: las pruebas no lo necesitan
+        client = MongoClient(os.environ["MONGO_URI"], serverSelectionTimeoutMS=3000)
+        db = client[os.environ.get("MONGO_DB", "pokemon")]
+    app.config["DB"] = db
+
+    from .routes import bp
+    app.register_blueprint(bp)
 
     @app.get("/health")
     def health():
@@ -18,5 +24,25 @@ def create_app(mongo_client=None):
         except Exception as exc:  # noqa: BLE001
             return jsonify(status="error", mongo=str(exc)), 503
         return jsonify(status="ok", mongo="up")
+
+    @app.errorhandler(404)
+    def not_found(_):
+        return jsonify(error="ruta no encontrada"), 404
+
+    @app.errorhandler(405)
+    def method_not_allowed(_):
+        return jsonify(error="metodo no permitido"), 405
+
+    @app.errorhandler(Exception)
+    def unexpected(exc):
+        # Errores de Mongo (p. ej. poligono con autointersecciones, tiempo agotado) -> respuesta limpia.
+        from werkzeug.exceptions import HTTPException
+        if isinstance(exc, HTTPException):
+            return jsonify(error=exc.description), exc.code
+        app.logger.exception("error no controlado")
+        name = type(exc).__name__
+        if name in ("OperationFailure", "ExecutionTimeout"):
+            return jsonify(error="la consulta fue rechazada por la base de datos", detail=str(exc)[:200]), 400
+        return jsonify(error="error interno"), 500
 
     return app
