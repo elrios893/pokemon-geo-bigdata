@@ -53,6 +53,10 @@ services:
     container_name: dask-worker-1
     restart: unless-stopped
     command: ["dask", "worker", "tcp://dask-scheduler:8786", "--nthreads", "2", "--memory-limit", "1GB", "--name", "worker-1"]
+    environment:
+      # Los workers cargan a Mongo directamente; la clave no viaja por el grafo de tareas de Dask.
+      MONGO_URI: mongodb://${MONGO_USER}:${MONGO_PASSWORD}@mongo:27017/?authSource=admin
+      MONGO_DB: ${MONGO_DB:-pokemon}
     depends_on:
       dask-scheduler:
         condition: service_healthy
@@ -65,19 +69,25 @@ services:
     container_name: dask-worker-2
     command: ["dask", "worker", "tcp://dask-scheduler:8786", "--nthreads", "2", "--memory-limit", "1GB", "--name", "worker-2"]
 
-  # ---------- Ingesta (un solo uso): limpieza con Dask -> Parquet ----------
-  # Uso:  docker compose --profile ingest run --rm ingest        (descarga primero con ingest/download.py)
+  # ---------- Ingesta (un solo uso): descarga -> limpieza con Dask (Parquet) -> carga a MongoDB ----------
+  # Uso:  docker compose --profile ingest run --rm ingest
   ingest:
     <<: *dask-image
     container_name: ingest
     profiles: ["ingest"]
-    command: ["python", "clean.py"]
+    command: ["sh", "-c", "python download.py && python clean.py && python load_mongo.py"]
     environment:
       DASK_SCHEDULER: tcp://dask-scheduler:8786
       RAW_DIR: /data/raw
       CLEAN_DIR: /data/clean
+      PARQUET_DIR: /data/clean/pokemon_spawns
+      CATALOG_FILE: /data/catalog/pokemon_catalog.json
       SAMPLE_ROWS: ${SAMPLE_ROWS:-2000000}
+      MONGO_URI: mongodb://${MONGO_USER}:${MONGO_PASSWORD}@mongo:27017/?authSource=admin
+      MONGO_DB: ${MONGO_DB:-pokemon}
     depends_on:
+      mongo:
+        condition: service_healthy
       dask-scheduler:
         condition: service_healthy
       dask-worker-1:
