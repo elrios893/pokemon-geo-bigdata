@@ -1,0 +1,5 @@
+dask[distributed]==2024.12.1
+pandas==2.2.3
+pyarrow==18.1.0
+pymongo==4.10.1
+requests==2.32.3

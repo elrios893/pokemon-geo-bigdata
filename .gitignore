@@ -1,0 +1,21 @@
+# Secretos
+.env
+kaggle.json
+*.pem
+
+# Datos (se descargan desde el pipeline); el catalogo de PokeAPI SI se versiona
+data/*
+!data/catalog/
+!data/catalog/pokemon_catalog.json
+
+# Enunciado
+*.docx
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# Otros
+.DS_Store

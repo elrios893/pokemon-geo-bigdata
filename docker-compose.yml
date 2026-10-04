@@ -1,0 +1,136 @@
+# Sistema completo: MongoDB + Spark + Dask + API Flask + Jenkins
+# Levantar:  docker compose up -d --build
+# Presupuesto de memoria (~6,5 GB) pensado para Docker Desktop con ~8 GB.
+name: bigdata-geo
+
+# La imagen de Dask se construye una sola vez (en dask-scheduler); workers la reutilizan.
+x-dask-image: &dask-image
+  image: bigdata-ingest:latest
+  pull_policy: never
+
+services:
+  mongo:
+    image: mongo:7.0
+    container_name: mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    command: ["mongod", "--wiredTigerCacheSizeGB", "1"]
+    mem_limit: 1536m
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  # ---------- Dask: 1 scheduler + 2 workers ----------
+  dask-scheduler:
+    <<: *dask-image
+    build:
+      context: ./ingest
+    pull_policy: build
+    container_name: dask-scheduler
+    restart: unless-stopped
+    command: ["dask", "scheduler", "--port", "8786", "--dashboard-address", ":8787"]
+    ports:
+      - "8786:8786"
+      - "8787:8787"
+    mem_limit: 384m
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; socket.create_connection(('localhost', 8786), 3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  dask-worker-1: &dask-worker
+    <<: *dask-image
+    container_name: dask-worker-1
+    restart: unless-stopped
+    command: ["dask", "worker", "tcp://dask-scheduler:8786", "--nthreads", "2", "--memory-limit", "1GB", "--name", "worker-1"]
+    depends_on:
+      dask-scheduler:
+        condition: service_healthy
+    volumes:
+      - ./data:/data
+    mem_limit: 1280m
+
+  dask-worker-2:
+    <<: *dask-worker
+    container_name: dask-worker-2
+    command: ["dask", "worker", "tcp://dask-scheduler:8786", "--nthreads", "2", "--memory-limit", "1GB", "--name", "worker-2"]
+
+  # ---------- Spark: 1 master + 1 worker (el conector de Mongo se pasa con --packages) ----------
+  spark-master:
+    image: apache/spark:3.5.3
+    container_name: spark-master
+    restart: unless-stopped
+    command: ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.master.Master", "--host", "spark-master"]
+    ports:
+      - "7077:7077"
+      - "8080:8080"
+    mem_limit: 512m
+
+  spark-worker:
+    image: apache/spark:3.5.3
+    container_name: spark-worker
+    restart: unless-stopped
+    command: ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.worker.Worker", "spark://spark-master:7077"]
+    environment:
+      SPARK_WORKER_CORES: "2"
+      SPARK_WORKER_MEMORY: "1g"
+    depends_on:
+      - spark-master
+    ports:
+      - "8082:8081"
+    volumes:
+      - ./processing:/opt/jobs:ro
+    mem_limit: 1536m
+
+  # ---------- API Flask ----------
+  api:
+    build:
+      context: ./api
+    image: bigdata-api:latest
+    container_name: api
+    restart: unless-stopped
+    environment:
+      MONGO_URI: mongodb://${MONGO_USER}:${MONGO_PASSWORD}@mongo:27017/?authSource=admin
+      MONGO_DB: ${MONGO_DB:-pokemon}
+    depends_on:
+      mongo:
+        condition: service_healthy
+    ports:
+      - "5000:5000"
+    mem_limit: 256m
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  # ---------- Jenkins (CI/CD) ----------
+  jenkins:
+    build:
+      context: ./jenkins
+    image: bigdata-jenkins:latest
+    container_name: jenkins
+    restart: unless-stopped
+    user: root   # necesario para usar el socket de Docker del host
+    ports:
+      - "8088:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    mem_limit: 1024m
+
+volumes:
+  mongo_data:
+  jenkins_home:
