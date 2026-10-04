@@ -10,3 +10,6 @@ RUN apt-get update \
  && apt-get update \
  && apt-get install -y --no-install-recommends docker-ce-cli docker-compose-plugin \
  && rm -rf /var/lib/apt/lists/*
+
+# Job del pipeline definido como codigo (se crea en el primer arranque)
+COPY init.groovy.d/ /usr/share/jenkins/ref/init.groovy.d/
