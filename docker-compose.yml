@@ -65,6 +65,29 @@ services:
     container_name: dask-worker-2
     command: ["dask", "worker", "tcp://dask-scheduler:8786", "--nthreads", "2", "--memory-limit", "1GB", "--name", "worker-2"]
 
+  # ---------- Ingesta (un solo uso): limpieza con Dask -> Parquet ----------
+  # Uso:  docker compose --profile ingest run --rm ingest        (descarga primero con ingest/download.py)
+  ingest:
+    <<: *dask-image
+    container_name: ingest
+    profiles: ["ingest"]
+    command: ["python", "clean.py"]
+    environment:
+      DASK_SCHEDULER: tcp://dask-scheduler:8786
+      RAW_DIR: /data/raw
+      CLEAN_DIR: /data/clean
+      SAMPLE_ROWS: ${SAMPLE_ROWS:-2000000}
+    depends_on:
+      dask-scheduler:
+        condition: service_healthy
+      dask-worker-1:
+        condition: service_started
+      dask-worker-2:
+        condition: service_started
+    volumes:
+      - ./data:/data
+    mem_limit: 768m
+
   # ---------- Spark: 1 master + 1 worker (el conector de Mongo se pasa con --packages) ----------
   spark-master:
     image: apache/spark:3.5.3
