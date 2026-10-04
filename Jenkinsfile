@@ -80,8 +80,8 @@ pipeline {
         }
 
         stage('Deploy') {
-            // Solo main se despliega; una rama probada con BRANCH=<rama> se queda en las pruebas.
-            when { expression { (params.BRANCH ?: 'main') == 'main' } }
+            // Solo el job de main despliega; el job con parametro BRANCH (pokemon-geo-bigdata-rama) solo prueba.
+            when { expression { params.BRANCH == null } }
             steps {
                 // Reutiliza las credenciales del MongoDB que ya corre (no se guardan en el repo ni en Jenkins).
                 sh '''

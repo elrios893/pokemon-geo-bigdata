@@ -1,7 +1,10 @@
-// Crea o actualiza el job del pipeline al arrancar Jenkins (job-as-code, sin pasos manuales).
+// Crea o actualiza los jobs del pipeline al arrancar Jenkins (job-as-code, sin pasos manuales).
 // El sufijo .override hace que la imagen sobrescriba la copia en JENKINS_HOME en cada arranque.
-// El parametro BRANCH (por defecto main) permite probar una rama antes de fusionarla: "Build with Parameters".
-// Los pushes del webhook usan el valor por defecto, asi que solo main se construye automaticamente.
+//
+//   pokemon-geo-bigdata        construye siempre */main; lo dispara el webhook de GitHub (y despliega).
+//   pokemon-geo-bigdata-rama   parametro BRANCH: prueba una rama antes de fusionarla; sin webhook, no despliega.
+//
+// Son dos jobs porque el sondeo del webhook no expande parametros en la rama (con '*/${BRANCH}' decia "No changes").
 import jenkins.model.Jenkins
 import hudson.model.ParametersDefinitionProperty
 import hudson.model.StringParameterDefinition
@@ -12,19 +15,27 @@ import org.jenkinsci.plugins.workflow.job.WorkflowJob
 import com.cloudbees.jenkins.GitHubPushTrigger
 
 def repoUrl = 'https://github.com/elrios893/pokemon-geo-bigdata.git'
-def jobName = 'pokemon-geo-bigdata'
 def jenkins = Jenkins.get()
 
-def job = jenkins.getItem(jobName)
-def created = (job == null)
-if (created) {
-    job = jenkins.createProject(WorkflowJob, jobName)
-    job.addTrigger(new GitHubPushTrigger())
+def ensureJob = { String name, String branchSpec, boolean webhook, boolean parametrized ->
+    def job = jenkins.getItem(name)
+    def created = (job == null)
+    if (created) {
+        job = jenkins.createProject(WorkflowJob, name)
+    }
+    def scm = new GitSCM(GitSCM.createRepoList(repoUrl, null), [new BranchSpec(branchSpec)], null, null, [])
+    job.setDefinition(new CpsScmFlowDefinition(scm, 'Jenkinsfile'))
+    job.removeProperty(ParametersDefinitionProperty)
+    if (parametrized) {
+        job.addProperty(new ParametersDefinitionProperty(
+            new StringParameterDefinition('BRANCH', 'main', 'Rama a probar (no se despliega nada si no es el job de main)')))
+    }
+    if (webhook && job.getTriggers().values().find { it instanceof GitHubPushTrigger } == null) {
+        job.addTrigger(new GitHubPushTrigger())
+    }
+    job.save()
+    println "init: job '${name}' ${created ? 'creado' : 'actualizado'}"
 }
-def scm = new GitSCM(GitSCM.createRepoList(repoUrl, null), [new BranchSpec('*/${BRANCH}')], null, null, [])
-job.setDefinition(new CpsScmFlowDefinition(scm, 'Jenkinsfile'))
-job.removeProperty(ParametersDefinitionProperty)
-job.addProperty(new ParametersDefinitionProperty(
-    new StringParameterDefinition('BRANCH', 'main', 'Rama a construir. Se prueba cualquier rama, pero solo main se despliega')))
-job.save()
-println "init: job '${jobName}' ${created ? 'creado' : 'actualizado'}"
+
+ensureJob('pokemon-geo-bigdata', '*/main', true, false)
+ensureJob('pokemon-geo-bigdata-rama', '*/${BRANCH}', false, true)
