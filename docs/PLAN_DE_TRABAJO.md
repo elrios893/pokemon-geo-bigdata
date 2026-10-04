@@ -39,7 +39,7 @@ Construir un sistema completo (no piezas sueltas) que:
   - part3: `https://storage.googleapis.com/kaggle-forum-message-attachments/138703/5005/catchemall_part3.zip`
   - part4: `https://storage.googleapis.com/kaggle-forum-message-attachments/138703/5007/catchemall_part4.zip`
 - **Estrategia de ingesta:** el pipeline descarga y descomprime por URL (`requests` en streaming), solo si el archivo no existe en `data/` (caché local, fuera de git). No requiere token. Se documenta en el README y el informe la procedencia (Kaggle, adjuntos del hilo) y la autoría del dataset original, y se registra como desviación frente a "descarga con la API de Kaggle" (ver §2.4).
-- **Variable `SAMPLE_ROWS`:** ver §2.6 (muestra de trabajo de 2.000.000, mínimo exigido 1.000.000).
+- **Variable `SAMPLE_STRIDE`:** ver §2.6 (muestreo de una de cada 4 filas, ≈ 2,24 M; mínimo exigido 1.000.000).
 - **Particularidades a tratar en la limpieza (§7):** concentración temporal en pocos días (el análisis por mes/año aporta poco; el foco es **hora y día**), 3.993 filas sin `pokemonId`, duplicados exactos (0,13 %), `localTime` poco fiable y fechas en formato extendido de Mongo (`$date`, `$oid`). Resultados completos del perfilado en §2.8.
 
 ### 2.2 Extensión opcional — CS:GO Competitive Matchmaking Damage (Fase F8)
@@ -62,9 +62,9 @@ Construir un sistema completo (no piezas sueltas) que:
 ### 2.6 Muestra de trabajo (decisión de alcance)
 
 - **Motivo:** el dataset completo (~8,96 M) más MongoDB, imágenes Docker y volúmenes no caben cómodamente en el disco del equipo (~8 GB libres) y alarga innecesariamente la ingesta. El enunciado permite trabajar con una muestra de **≥ 1.000.000 de registros** si la descarga completa queda automatizada.
-- **Muestra objetivo:** `SAMPLE_ROWS = 2.000.000` (500.000 por cada parte). Margen de seguridad: tras limpieza y deduplicación deben quedar **≥ 1.000.000** registros; si no, se sube `SAMPLE_ROWS`.
-- **Criterio de muestreo:** primeras N filas de cada parte, porque las partes siguen aproximadamente el orden de inserción (el perfilado muestra que cada parte contiene unas pocas filas tempranas de julio, pero el grueso avanza de part1 ≈ 21–22 sep a part4 ≈ 25–26 sep). No son estrictamente cronológicas, pero la muestra cubre 13 jul – 25 sep y conserva la dispersión geográfica (cientos de ciudades) sin cargar todo. El criterio queda documentado y es reproducible (no aleatorio).
-- La descarga y descompresión de los 4 ZIP completos siguen automatizadas; solo la **carga a MongoDB** se limita con `SAMPLE_ROWS` (valor `0` = todo).
+- **Muestra objetivo:** `SAMPLE_STRIDE = 4` (una de cada 4 líneas de cada parte, ≈ 2,24 M). Tras limpieza y deduplicación quedan **2.239.470** registros (mínimo exigido 1.000.000). `SAMPLE_STRIDE=1` carga todo.
+- **Criterio de muestreo:** sistemático (línea % K == 0), reproducible y no aleatorio. Sustituye al criterio inicial "primeras 500.000 de cada parte", que dejaba el 0,7 % de viernes frente al 7,4 % de la población (ver §2.9). Con el muestreo sistemático se cubren los 81 días del dataset.
+- La descarga y descompresión de los 4 ZIP completos siguen automatizadas; solo la **carga a MongoDB** se limita con `SAMPLE_STRIDE`.
 
 ### 2.7 Enriquecimiento con PokeAPI
 
@@ -115,7 +115,10 @@ Relación entre avistamientos que comparten coordenada (pares consecutivos en el
 1. **No se eliminan registros por compartir posición.** Son observaciones distintas (otro momento, a menudo otra especie) y su relación es justamente una propiedad del dataset (persistencia del tipo en cada punto). Borrarlos destruiría la señal que se analiza. Tampoco se añade una regla de ventana de 15 min: afectaría 0,2 % de la muestra.
 2. **El porcentaje de posiciones repetidas no puede "bajarse" con el muestreo:** adelgazar la muestra reduce las coincidencias (57–58 % de avistamientos en puntos repetidos frente a 81 % real) pero no es una propiedad de los datos. Se documenta que la muestra **subestima** la repetición.
 3. **Se cambia el criterio de muestreo de "primeras N filas" a "una de cada K filas"** (`SAMPLE_STRIDE`): conserva la distribución temporal del dataset completo (viernes 7,4 % como en la población, frente a 0,7 % antes) con el mismo tamaño y mismo costo. §2.6 queda reemplazado por este criterio una vez aplicado.
-4. Los hotspots se interpretan junto con el número de **puntos distintos** por celda; `agg_grid` y `agg_hotspots` incorporarán `puntos_distintos` (conteo exacto de coordenadas distintas).
+4. Los hotspots se interpretan junto con el número de **puntos distintos** por celda: `agg_grid` y `agg_hotspots` incluyen `puntos_distintos` (conteo exacto de coordenadas distintas). Verificado: hotspot #1 (Central Park) 5.269 avistamientos en 982 puntos, confirmado con una agregación independiente en Mongo.
+5. `POST /within?count=true` devuelve además `total` (el listado sigue limitado por `limit`).
+
+**Aplicado** (rama `feat/sample-stride`): muestra nueva de 2.239.470 documentos; Spark con invariantes de suma correctos.
 
 ### 2.5 Diseño agnóstico al dataset
 
@@ -262,7 +265,7 @@ Ensayo previo del escenario de "modificación en vivo": agregar un endpoint nuev
 | Los enlaces de los adjuntos de Kaggle dejan de funcionar o cambian | Mantener la caché local en `data/`; guardar los ZIP también como respaldo propio (p. ej. dataset privado de Kaggle) y documentar el origen |
 | El docente no acepta la descarga por URL o las coordenadas de CS:GO | Consulta temprana (§2.4); respaldo con Chicago Crime vía API de Kaggle |
 | Tiempo insuficiente (6 días, trabajo individual) | F8 es opcional; se prioriza el sistema completo sobre Pokémon |
-| ~9 M de registros pesan en memoria/carga | Particionado en Dask, inserts por lotes, límites de memoria y `SAMPLE_ROWS` |
+| ~9 M de registros pesan en memoria/carga | Particionado en Dask, inserts por lotes, límites de memoria y `SAMPLE_STRIDE` |
 | Memoria insuficiente para el dataset completo | Usar muestra ≥ 1M filas; límites de memoria por servicio en compose |
 | Incompatibilidad de versiones Spark ↔ conector de Mongo | Fijar versiones exactas y pasarlas con `--packages` |
 | Jenkins necesita ejecutar Docker | Montar el socket de Docker y añadir el usuario de Jenkins al grupo `docker` |

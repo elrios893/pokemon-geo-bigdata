@@ -3,7 +3,7 @@ from datetime import datetime
 from flask import Blueprint, current_app, jsonify, request
 
 from . import queries
-from .validation import (ValidationError, parse_limit, parse_lat_lng, parse_pokemon_id,
+from .validation import (ValidationError, parse_flag, parse_limit, parse_lat_lng, parse_pokemon_id,
                          parse_polygon, parse_radius)
 
 bp = Blueprint("api", __name__)
@@ -70,16 +70,23 @@ def near():
 
 @bp.post("/within")
 def within():
-    """POST /within  (cuerpo: GeoJSON Polygon o Feature)[?pokemonId=][&limit=]  ->  avistamientos dentro ($geoWithin)."""
+    """POST /within  (cuerpo: GeoJSON Polygon o Feature)[?pokemonId=][&limit=][&count=true]  ->  avistamientos dentro ($geoWithin).
+
+    Con count=true se agrega `total` (count_documents sobre el mismo filtro): `results` esta limitado, el total no."""
     polygon = parse_polygon(request.get_json(silent=True))
     pid = parse_pokemon_id(request.args)
     limit = parse_limit(request.args)
-    cur = _db().spawns.find(queries.within_filter(polygon, pid)).limit(limit + 1).max_time_ms(MAX_TIME_MS)
+    want_total = parse_flag(request.args, "count")
+    flt = queries.within_filter(polygon, pid)
+    cur = _db().spawns.find(flt).limit(limit + 1).max_time_ms(MAX_TIME_MS)
     docs = list(cur)
     truncated = len(docs) > limit
     results = [_spawn(d) for d in docs[:limit]]
-    return jsonify(query={"pokemonId": pid, "vertices": len(polygon["coordinates"][0])},
-                   count=len(results), truncated=truncated, results=results)
+    body = {"query": {"pokemonId": pid, "vertices": len(polygon["coordinates"][0])},
+            "count": len(results), "truncated": truncated, "results": results}
+    if want_total:
+        body["total"] = _db().spawns.count_documents(flt, maxTimeMS=MAX_TIME_MS)
+    return jsonify(body)
 
 
 @bp.get("/geonear")

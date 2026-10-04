@@ -53,6 +53,14 @@ def test_within_trunca_con_limit(client, db):
     assert r["count"] == 2 and r["truncated"] is True
 
 
+def test_within_total_solo_si_se_pide(client, db):
+    assert "total" not in client.post("/within", json=POLY).get_json()
+    r = client.post("/within?count=true&pokemonId=16", json=POLY).get_json()
+    assert r["total"] == 1234 and r["count"] == 1
+    assert db.spawns.calls[-1]["count_filter"] == queries.within_filter(POLY, 16)
+    assert client.post("/within?count=quizas", json=POLY).status_code == 400
+
+
 @pytest.mark.parametrize("kw", [
     {"json": {"type": "Point", "coordinates": [0, 0]}}, {"json": [1, 2]}, {"data": "no es json"},
     {"data": "{}", "content_type": "application/json"}, {},

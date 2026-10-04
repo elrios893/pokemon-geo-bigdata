@@ -82,7 +82,7 @@ services:
       CLEAN_DIR: /data/clean
       PARQUET_DIR: /data/clean/pokemon_spawns
       CATALOG_FILE: /data/catalog/pokemon_catalog.json
-      SAMPLE_ROWS: ${SAMPLE_ROWS:-2000000}
+      SAMPLE_STRIDE: ${SAMPLE_STRIDE:-4}
       MONGO_URI: mongodb://${MONGO_USER}:${MONGO_PASSWORD}@mongo:27017/?authSource=admin
       MONGO_DB: ${MONGO_DB:-pokemon}
     depends_on:

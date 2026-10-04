@@ -8,8 +8,8 @@ Variables de entorno (todas opcionales):
   DASK_SCHEDULER  tcp://dask-scheduler:8786
   RAW_DIR         /data/raw            (catchemall_part*.json)
   CLEAN_DIR       /data/clean
-  SAMPLE_ROWS     2000000              total de filas; se toman las primeras N/4 de cada parte (0 = todo)
-  CHUNK_LINES     200000               lineas por particion
+  SAMPLE_STRIDE   4                    muestreo sistematico: se toma 1 de cada K lineas (1 = todo, ~2.2 M con K=4)
+  CHUNK_LINES     200000               lineas por particion (se ajusta a multiplo de K)
 """
 import itertools
 import json
@@ -30,8 +30,8 @@ from cleaning import COLUMNS, clean_record
 SCHEDULER = os.environ.get("DASK_SCHEDULER", "tcp://dask-scheduler:8786")
 RAW_DIR = Path(os.environ.get("RAW_DIR", "/data/raw"))
 CLEAN_DIR = Path(os.environ.get("CLEAN_DIR", "/data/clean"))
-SAMPLE_ROWS = int(os.environ.get("SAMPLE_ROWS", "2000000"))
-CHUNK_LINES = int(os.environ.get("CHUNK_LINES", "200000"))
+STRIDE = max(1, int(os.environ.get("SAMPLE_STRIDE", "4")))
+CHUNK_LINES = int(os.environ.get("CHUNK_LINES", "200000")) // STRIDE * STRIDE or STRIDE
 SPLIT_OUT = int(os.environ.get("SPLIT_OUT", "8"))
 DEDUP_KEY = ["pokemonId", "lng", "lat", "appeared_utc"]
 
@@ -56,14 +56,16 @@ def count_lines(path):
     return n
 
 
-def process_chunk(path, start, end):
-    """Se ejecuta en un worker: lee lineas [start, end) de path y aplica las reglas."""
+def process_chunk(path, start, end, stride=1):
+    """Se ejecuta en un worker: lee 1 de cada `stride` lineas de [start, end) de path y aplica las reglas.
+
+    `start` es multiplo de `stride`, asi la seleccion equivale a (numero de linea % stride == 0) en todo el archivo."""
     from cleaning import clean_record as rule  # import local: el worker usa su propia copia
 
     stats = Counter()
     rows = []
     with open(path, "rb") as f:
-        for raw in itertools.islice(f, start, end):
+        for raw in itertools.islice(f, start, end, stride):
             raw = raw.strip()
             if not raw:
                 continue
@@ -94,18 +96,16 @@ def main():
     n_workers = len(client.scheduler_info()["workers"])
     print(f"Dask: {n_workers} workers en {SCHEDULER}", flush=True)
 
-    per_file = (SAMPLE_ROWS // len(files)) if SAMPLE_ROWS > 0 else None
     parts, stats_parts, plan = [], [], []
     for f in files:
         total = count_lines(f)
-        take = total if per_file is None else min(per_file, total)
-        plan.append({"archivo": f.name, "lineas_archivo": total, "lineas_tomadas": take})
-        for start in range(0, take, CHUNK_LINES):
-            end = min(start + CHUNK_LINES, take)
-            res = delayed(process_chunk, nout=2)(str(f), start, end)
+        plan.append({"archivo": f.name, "lineas_archivo": total, "lineas_tomadas": -(-total // STRIDE)})
+        for start in range(0, total, CHUNK_LINES):
+            end = min(start + CHUNK_LINES, total)
+            res = delayed(process_chunk, nout=2)(str(f), start, end, STRIDE)
             parts.append(res[0])
             stats_parts.append(res[1])
-    print(f"Plan: {len(parts)} particiones ({CHUNK_LINES:,} lineas c/u); muestra={'completa' if per_file is None else f'{per_file:,} por parte'}", flush=True)
+    print(f"Plan: {len(parts)} particiones ({CHUNK_LINES:,} lineas c/u); muestra={'completa' if STRIDE == 1 else f'1 de cada {STRIDE} lineas'}", flush=True)
 
     df = dd.from_delayed(parts, meta=META)
     # split_out reparte la deduplicacion (shuffle por clave) en varias particiones de salida;
@@ -125,7 +125,7 @@ def main():
     after_rules = total["tras_reglas"]
 
     report = {
-        "muestra_filas_solicitadas": SAMPLE_ROWS,
+        "muestreo_una_de_cada": STRIDE,
         "archivos": plan,
         "leidas": total["leidas"],
         "descartadas_por_regla": {
