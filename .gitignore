@@ -11,8 +11,9 @@ data/*
 # Enunciado
 *.docx
 
-# Bitacora y guia de sustentacion personal (no se versiona)
+# Bitacora y guia de sustentacion personal (no se versionan)
 docs/qa_technical.md
+docs/trace_log.md
 
 # Python
 __pycache__/

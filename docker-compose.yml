@@ -125,6 +125,41 @@ services:
       - ./processing:/opt/jobs:ro
     mem_limit: 1536m
 
+  # ---------- Job de Spark (un solo uso): agregaciones espaciales y temporales ----------
+  # Uso:  docker compose --profile spark run --rm spark-job
+  # El driver corre aqui (modo client); el conector de Mongo se baja con --packages (cache en data/ivy).
+  spark-job:
+    image: apache/spark:3.5.3
+    profiles: ["spark"]
+    entrypoint: ["sh", "-c"]
+    command:
+      - >-
+        /opt/spark/bin/spark-submit
+        --master spark://spark-master:7077
+        --packages org.mongodb.spark:mongo-spark-connector_2.12:10.4.0
+        --conf spark.jars.ivy=/tmp/ivy
+        --conf spark.driver.host=$$(hostname -i)
+        --conf spark.driver.bindAddress=0.0.0.0
+        --conf spark.driver.memory=512m
+        --conf spark.executor.memory=768m
+        /opt/jobs/jobs/aggregate.py
+    environment:
+      MONGO_URI: mongodb://${MONGO_USER}:${MONGO_PASSWORD}@mongo:27017/?authSource=admin
+      MONGO_DB: ${MONGO_DB:-pokemon}
+      GRID_DEG: ${GRID_DEG:-0.01}
+      HOTSPOT_TOP: ${HOTSPOT_TOP:-200}
+    depends_on:
+      mongo:
+        condition: service_healthy
+      spark-master:
+        condition: service_started
+      spark-worker:
+        condition: service_started
+    volumes:
+      - ./processing:/opt/jobs:ro
+      - ./data/ivy:/tmp/ivy
+    mem_limit: 1024m
+
   # ---------- API Flask ----------
   api:
     build:
