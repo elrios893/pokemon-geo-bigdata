@@ -1,0 +1,56 @@
+flowchart TB
+  USER(["Cliente<br/>curl / navegador"])
+
+  subgraph EXT["Servicios externos"]
+    direction LR
+    DSET[("Dataset Pokémon GO<br/>4 ZIP por HTTPS")]
+    PKAPI["PokeAPI<br/>151 consultas, una vez"]
+    GH["GitHub<br/>repo + webhook"]
+  end
+
+  subgraph HOST["Docker Compose · proyecto bigdata-geo · una sola red"]
+    direction TB
+
+    subgraph ING["Ingesta y limpieza"]
+      direction LR
+      INGEST["ingest<br/>download.py → clean.py → load_mongo.py"]
+      SCHED["Dask scheduler :8786"]
+      WORK["Dask workers ×2"]
+    end
+
+    VOL[("Volumen ./data<br/>raw JSON · Parquet limpio · catálogo")]
+
+    MONGO[("MongoDB 7 :27017<br/>spawns GeoJSON + 2dsphere<br/>pokemon_catalog · agg_*")]
+
+    subgraph PROC["Procesamiento"]
+      direction LR
+      SMASTER["Spark master :7077"]
+      SWORK["Spark workers ×2<br/>conector MongoDB 10.4"]
+    end
+
+    API["API Flask + gunicorn :5000<br/>near · within · geonear · stats"]
+
+    subgraph CICD["CI/CD"]
+      direction LR
+      SMEE["smee client"]
+      JENK["Jenkins :8088<br/>Jenkinsfile"]
+    end
+  end
+
+  CIENV[("Stack efímero de CI<br/>mongo + api, sin puertos")]
+
+  DSET -->|"descarga"| INGEST
+  PKAPI -.->|"catálogo"| VOL
+  INGEST -->|"envía tareas"| SCHED --> WORK
+  INGEST --> VOL
+  WORK -->|"lee raw, escribe Parquet"| VOL
+  WORK -->|"insert_many por lotes"| MONGO
+  VOL -.->|"catálogo"| MONGO
+  SMASTER --- SWORK
+  MONGO <-->|"lee spawns · escribe agg_*"| SWORK
+  API -->|"pymongo"| MONGO
+  USER -->|"HTTP"| API
+
+  GH -->|"webhook"| SMEE --> JENK
+  JENK -->|"pytest + pruebas de humo"| CIENV
+  JENK ==>|"deploy: recrea solo api"| API

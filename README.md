@@ -5,7 +5,7 @@ lo limpia con **Dask**, lo guarda en **MongoDB** como GeoJSON con índice `2dsph
 temporales con **Spark**, expone consultas geoespaciales mediante una API **Flask** y se construye, prueba y despliega con
 **Jenkins** disparado por un webhook de GitHub. Trabajo individual, curso de Big Data (IUE).
 
-- Informe técnico y decisiones: [`docs/PLAN_DE_TRABAJO.md`](docs/PLAN_DE_TRABAJO.md) (perfilado, reglas de limpieza, fases).
+- Informe técnico: [`docs/informe/INFORME_TECNICO.md`](docs/informe/INFORME_TECNICO.md) ([PDF](docs/informe/INFORME_TECNICO.pdf)). Plan, perfilado y reglas de limpieza: [`docs/PLAN_DE_TRABAJO.md`](docs/PLAN_DE_TRABAJO.md).
 - Benchmark Dask vs Spark: [`benchmark/README.md`](benchmark/README.md).
 
 ## Arquitectura
@@ -119,6 +119,17 @@ Las pruebas de humo (18 comprobaciones contra un MongoDB real efímero) las ejec
 3. Etapas del [`Jenkinsfile`](Jenkinsfile): checkout → validar compose → build de imágenes → pytest (API e ingesta) →
    stack efímero (`docker-compose.ci.yml`) + pruebas de humo → **deploy**. Cada etapa depende de la anterior, de modo que **si una prueba falla no se despliega**.
    Se despliega la misma imagen que pasó las pruebas, y solo el servicio `api`; las credenciales de MongoDB se leen del contenedor en ejecución (no hay secretos en el repo).
+
+## Documentación y herramientas
+
+- Diagrama de arquitectura: fuente Mermaid `docs/img/arquitectura.mmd`, imagen `docs/img/arquitectura.png`.
+- Regenerar la imagen y el PDF del informe (requiere Node y Chrome o Edge instalados):
+
+```bash
+cd tools/docs_pdf && npm install
+node render_mermaid.mjs --input ../../docs/img/arquitectura.mmd --output ../../docs/img/arquitectura.png
+node generate.mjs            # docs/informe/INFORME_TECNICO.md -> .pdf
+```
 
 ## Estructura del repositorio
 
