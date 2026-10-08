@@ -130,3 +130,32 @@ def test_error_inesperado_es_500_sin_filtrar_detalles():
     app.testing = False
     r = app.test_client().get("/near?lat=1&lng=1&radius=10")
     assert r.status_code == 500 and "secreto" not in r.get_data(as_text=True)
+
+
+@pytest.mark.parametrize("path", [
+    "/static/app.js", "/static/app.css", "/static/vendor/leaflet.js", "/static/vendor/leaflet-heat.js",
+    "/static/vendor/leaflet.draw.js", "/static/vendor/fonts/geist-latin-400.woff2",
+])
+def test_interfaz_web_y_estaticos(client, path):
+    page = client.get("/")
+    assert page.status_code == 200 and b"leaflet" in page.data and page.mimetype == "text/html"
+    assert client.get(path).status_code == 200      # la UI no depende de CDN: todo viaja en la imagen
+
+
+def test_filtro_por_tipo_se_traduce_a_ids_del_catalogo(client, db):
+    r = client.get("/near?lat=40.758&lng=-73.9855&radius=500&type=flying")
+    assert r.status_code == 200 and r.get_json()["query"]["type"] == "flying"
+    assert db.spawns.calls[-1]["filter"]["pokemonId"] == {"$in": [16]}           # solo pidgey es flying en el catalogo falso
+    client.get("/near?lat=40.758&lng=-73.9855&radius=500&type=normal")
+    assert db.spawns.calls[-1]["filter"]["pokemonId"] == {"$in": [16, 19]}
+    client.get("/near?lat=40.758&lng=-73.9855&radius=500&type=normal&pokemonId=19")  # tipo + especie = interseccion
+    assert db.spawns.calls[-1]["filter"]["pokemonId"] == {"$in": [19]}
+    client.get("/geonear?lat=40.758&lng=-73.9855&radius=500&type=flying")
+    assert db.spawns.calls[-1]["pipeline"][0]["$geoNear"]["query"] == {"pokemonId": {"$in": [16]}}
+    client.post("/within?type=flying", json=POLY)
+    assert db.spawns.calls[-1]["filter"]["pokemonId"] == {"$in": [16]}
+
+
+def test_tipo_invalido_devuelve_400(client):
+    r = client.get("/near?lat=40.758&lng=-73.9855&radius=500&type=laser")
+    assert r.status_code == 400 and "type" in r.get_json()["error"]
