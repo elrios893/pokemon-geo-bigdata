@@ -87,6 +87,22 @@ curl "localhost:5000/stats/hotspots?limit=3"
 
 Cada avistamiento se enriquece con `name` y `types` desde el catálogo de PokeAPI guardado en MongoDB (la API nunca llama a PokeAPI).
 
+## Interfaz web
+
+Abrir <http://localhost:5000/> con el stack levantado. Es una página estática (HTML/JS, sin paso de build) servida por la misma API Flask y desplegada por el mismo pipeline. Consume los endpoints de arriba y los dibuja en un mapa de [Leaflet](https://leafletjs.com/):
+
+| Pestaña | Endpoint | Qué hace |
+|---|---|---|
+| Cerca | `/near`, `/geonear` | clic o arrastre del centro, radio y especie; muestra los puntos y la distancia |
+| Zona | `POST /within?count=true` | se dibuja un polígono o rectángulo; muestra el total real y los puntos |
+| Hotspots | `/stats/hotspots`, `/stats/grid` | celdas más densas numeradas y mapa de calor del encuadre visible |
+| Tiempo | `/stats/time`, `/stats/species`, `/stats/species/<id>/hours` | gráficas por hora, día de la semana y fecha; horas de cada especie |
+
+Cada consulta muestra, debajo, la URL exacta que se llamó (con el `curl` en los `POST`) y el JSON crudo de la respuesta.
+Leaflet, Leaflet.heat, Leaflet.draw y la tipografía Geist se sirven desde `api/app/static/vendor/` (no dependen de un CDN); solo los mosaicos del mapa base (© OpenStreetMap) requieren internet y, sin ellos, se siguen viendo los puntos.
+
+![Interfaz web](docs/img/interfaz.png)
+
 ## Modelo de datos
 
 Colección `spawns` (≈ 2,24 M de documentos con `SAMPLE_STRIDE=4`):
@@ -103,7 +119,7 @@ Colección `spawns` (≈ 2,24 M de documentos con `SAMPLE_STRIDE=4`):
 ## Pruebas
 
 ```bash
-docker run --rm bigdata-api:latest python -m pytest tests -q    # 59 pruebas de la API (base simulada)
+docker run --rm bigdata-api:latest python -m pytest tests -q    # 65 pruebas de la API (base simulada)
 python -m pytest tests/unit -q                                  # 16 pruebas de limpieza, carga y muestreo (requiere las dependencias de ingest/)
 ```
 
@@ -163,6 +179,7 @@ docs/         plan de trabajo, perfilado y decisiones
 - Dataset "Catch Them All" (Pokémon GO, avistamientos 2016), publicado en los foros del dataset *Predict'em All* de Kaggle: <https://www.kaggle.com/datasets/semioniy/predictemall/discussion/24246>. Los ZIP se descargan de las URL adjuntas de esa discusión (`ingest/download.py`).
 - Catálogo de especies: [PokeAPI](https://pokeapi.co/) (151 consultas, una sola vez; resultado versionado en `data/catalog/`).
 - Conector de MongoDB para Spark 10.4: <https://www.mongodb.com/docs/spark-connector/v10.4/>. Imágenes oficiales: `mongo`, `apache/spark`, `jenkins/jenkins`.
+- Interfaz: [Leaflet](https://leafletjs.com/) 1.9.4 (BSD-2), [Leaflet.heat](https://github.com/Leaflet/Leaflet.heat) (BSD-2), [Leaflet.draw](https://github.com/Leaflet/Leaflet.draw) (MIT), tipografía [Geist](https://github.com/vercel/geist-font) (OFL) vía [Fontsource](https://fontsource.org/), mapa base © [OpenStreetMap](https://www.openstreetmap.org/copyright) (ODbL).
 - Puente de webhooks: [smee.io](https://smee.io/) y `smee-client`.
 - Patrón de agregación personalizada de Dask (probado y descartado por lento): <https://docs.dask.org/en/stable/generated/dask.dataframe.Aggregation.html>.
 - Todo el código del repositorio es propio, escrito para este trabajo; no se tomó código de otros equipos ni de repositorios públicos.

@@ -159,7 +159,7 @@ El `Jenkinsfile` declarativo tiene siete etapas: checkout, validación de los co
 - El benchmark corre en un único equipo (cluster simulado, 12 CPU virtuales y 8 GB) y solo hasta 2,24 M de filas.
 - Mejoras de seguridad de la sección 9 sin aplicar; `/within` devuelve a lo sumo `limit` registros (el total solo con `count=true`).
 - La descarga usa las URL del foro de Kaggle en lugar de la API de Kaggle.
-- El mapa con Leaflet (opcional) y la extensión con CS:GO quedaron fuera de alcance.
+- La extensión con CS:GO quedó fuera de alcance. El mapa con Leaflet se incluyó como interfaz web sobre la misma API (README, sección «Interfaz web»).
 
 ## Fuentes
 

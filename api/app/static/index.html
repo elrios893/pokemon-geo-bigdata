@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mapa de avistamientos</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="/static/vendor/leaflet.css">
+<link rel="stylesheet" href="/static/vendor/leaflet.draw.css">
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="side">
+    <header class="brand">
+      <h1>Avistamientos<br>en el mapa</h1>
+      <p>2,24 M de puntos Pokémon GO · MongoDB + Spark · <span id="health" class="health">comprobando…</span></p>
+    </header>
+
+    <nav class="tabs" role="tablist">
+      <button role="tab" data-tab="near" class="on">Cerca</button>
+      <button role="tab" data-tab="within">Zona</button>
+      <button role="tab" data-tab="hot">Hotspots</button>
+      <button role="tab" data-tab="time">Tiempo</button>
+    </nav>
+
+    <div class="panels">
+      <section id="tab-near" class="panel">
+        <p class="hint">Haz clic en el mapa (o arrastra el punto) para elegir el centro.</p>
+        <div class="row">
+          <label>Operador
+            <select id="n-mode"><option value="near">/near · $near</option><option value="geonear">/geonear · $geoNear</option></select>
+          </label>
+          <label>Especie <select id="n-species" class="species"></select></label>
+        </div>
+        <label>Radio <output id="n-radius-o">500 m</output>
+          <input id="n-radius" type="range" min="50" max="5000" step="50" value="500">
+        </label>
+        <div class="row">
+          <label>Límite <input id="n-limit" type="number" min="1" max="1000" value="100"></label>
+          <label>Centro <input id="n-center" readonly></label>
+        </div>
+        <button id="n-go" class="go">Buscar</button>
+      </section>
+
+      <section id="tab-within" class="panel" hidden>
+        <p class="hint">Dibuja un polígono o rectángulo con las herramientas del mapa (arriba a la izquierda).</p>
+        <div class="row">
+          <label>Especie <select id="w-species" class="species"></select></label>
+          <label>Límite <input id="w-limit" type="number" min="1" max="1000" value="300"></label>
+        </div>
+        <button id="w-clear" class="ghost">Borrar zona</button>
+      </section>
+
+      <section id="tab-hot" class="panel" hidden>
+        <p class="hint">Resultados precalculados por Spark sobre toda la muestra.</p>
+        <div class="row">
+          <label>Hotspots <input id="h-limit" type="number" min="1" max="200" value="30"></label>
+          <label class="check"><input id="h-heat" type="checkbox" checked> Mapa de calor</label>
+        </div>
+        <button id="h-go" class="go">Cargar hotspots</button>
+      </section>
+
+      <section id="tab-time" class="panel" hidden>
+        <div class="seg" id="t-gran">
+          <button data-g="hour" class="on">Hora local</button>
+          <button data-g="dow">Día de semana</button>
+          <button data-g="day">Fecha</button>
+        </div>
+        <div id="t-chart" class="chart"></div>
+        <h2>Especies más vistas</h2>
+        <p class="hint">Clic en una especie para ver a qué horas aparece.</p>
+        <div id="t-species" class="rank"></div>
+      </section>
+
+      <div id="summary" class="summary" aria-live="polite"></div>
+      <ol id="list" class="list"></ol>
+    </div>
+
+    <details class="raw" open>
+      <summary>JSON crudo de la API</summary>
+      <div class="rawbar">
+        <code id="raw-url">—</code>
+        <button id="raw-copy" class="ghost sm">Copiar URL</button>
+        <a id="raw-open" class="ghost sm" target="_blank" rel="noopener">Abrir</a>
+      </div>
+      <pre id="raw-meta"></pre>
+      <pre id="raw-body"></pre>
+    </details>
+  </aside>
+
+  <main class="stage">
+    <div id="map"></div>
+    <div id="notice" class="notice" hidden>Sin mosaicos del mapa (sin internet): se muestran solo los puntos.</div>
+  </main>
+</div>
+
+<script src="/static/vendor/leaflet.js"></script>
+<script src="/static/vendor/leaflet-heat.js"></script>
+<script src="/static/vendor/leaflet.draw.js"></script>
+<script src="/static/app.js"></script>
+</body>
+</html>

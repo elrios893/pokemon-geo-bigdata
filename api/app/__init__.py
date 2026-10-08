@@ -17,6 +17,9 @@ def create_app(db=None):
     from .routes import bp
     app.register_blueprint(bp)
 
+    from .ui import ui
+    app.register_blueprint(ui)
+
     @app.get("/health")
     def health():
         try:

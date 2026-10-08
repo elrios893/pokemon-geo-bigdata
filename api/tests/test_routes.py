@@ -130,3 +130,13 @@ def test_error_inesperado_es_500_sin_filtrar_detalles():
     app.testing = False
     r = app.test_client().get("/near?lat=1&lng=1&radius=10")
     assert r.status_code == 500 and "secreto" not in r.get_data(as_text=True)
+
+
+@pytest.mark.parametrize("path", [
+    "/static/app.js", "/static/app.css", "/static/vendor/leaflet.js", "/static/vendor/leaflet-heat.js",
+    "/static/vendor/leaflet.draw.js", "/static/vendor/fonts/geist-latin-400.woff2",
+])
+def test_interfaz_web_y_estaticos(client, path):
+    page = client.get("/")
+    assert page.status_code == 200 and b"leaflet" in page.data and page.mimetype == "text/html"
+    assert client.get(path).status_code == 200      # la UI no depende de CDN: todo viaja en la imagen
