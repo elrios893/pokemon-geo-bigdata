@@ -15,7 +15,7 @@ const colorOf = (types) => TYPE_COLOR[(types || [])[0]] || "#78716c";
 const DOW = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
 
 /* ---------- mapa ---------- */
-const map = L.map("map", { zoomControl: true }).setView([40.758, -73.9855], 13);
+const map = L.map("map", { zoomControl: true, preferCanvas: true }).setView([40.758, -73.9855], 13);
 const tiles = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
   maxZoom: 19, attribution: "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a>",
 }).addTo(map);
@@ -30,7 +30,8 @@ let heat = null;
 
 /* ---------- llamada a la API + panel de JSON crudo ---------- */
 let lastUrl = "";
-async function api(path, { method = "GET", body } = {}) {
+const inflight = {};
+async function api(path, { method = "GET", body, key } = {}) {
   const url = location.origin + path;
   const t0 = performance.now();
   lastUrl = url;
@@ -39,7 +40,9 @@ async function api(path, { method = "GET", body } = {}) {
   $("raw-open").hidden = method !== "GET";
   if (method === "GET") $("raw-open").href = url;
   $("raw-meta").textContent = "consultando…";
-  const res = await fetch(url, { method, headers: body ? { "Content-Type": "application/json" } : {}, body: body ? JSON.stringify(body) : undefined });
+  let signal;
+  if (key) { inflight[key]?.abort(); const ac = (inflight[key] = new AbortController()); signal = ac.signal; }   // descarta la consulta anterior de la misma clase
+  const res = await fetch(url, { method, signal, headers: body ? { "Content-Type": "application/json" } : {}, body: body ? JSON.stringify(body) : undefined });
   const text = await res.text();
   const ms = Math.round(performance.now() - t0);
   let data = null;
@@ -62,6 +65,7 @@ $("raw-copy").onclick = () => {
 };
 
 function fail(err) {
+  if (err.name === "AbortError") return;
   $("summary").innerHTML = `<span class="warn">Error: ${esc(err.message)}</span>`;
   $("list").innerHTML = "";
 }
@@ -69,7 +73,7 @@ function fail(err) {
 /* ---------- pestañas ---------- */
 let tab = "near";
 function setTab(name) {
-  tab = name;
+  tab = name; focused = null; cellBox = null;
   document.querySelectorAll(".tabs button").forEach((b) => b.classList.toggle("on", b.dataset.tab === name));
   document.querySelectorAll(".panel").forEach((p) => (p.hidden = p.id !== "tab-" + name));
   results.clearLayers(); overlay.clearLayers(); drawn.clearLayers();
@@ -90,6 +94,9 @@ async function loadSpecies() {
   const opts = '<option value="">Todas</option>' +
     [...species].sort((a, b) => a.name.localeCompare(b.name)).map((s) => `<option value="${s.pokemonId}">${esc(s.name)} (#${s.pokemonId})</option>`).join("");
   document.querySelectorAll("select.species").forEach((s) => (s.innerHTML = opts));
+  const types = [...new Set(species.flatMap((s) => s.types || []))].sort();
+  const topts = '<option value="">Todos</option>' + types.map((t) => `<option value="${t}">${t}</option>`).join("");
+  document.querySelectorAll("select.types").forEach((s) => (s.innerHTML = topts));
 }
 
 /* ---------- lista y marcadores de avistamientos ---------- */
@@ -133,14 +140,16 @@ $("n-radius").oninput = () => {
 $("n-radius").onchange = () => runNear();
 $("n-species").onchange = () => runNear();
 $("n-mode").onchange = () => runNear();
+$("n-type").onchange = () => runNear();
 $("n-limit").onchange = () => runNear();
 $("n-go").onclick = () => runNear();
 
 async function runNear() {
   const q = new URLSearchParams({ lat: center.lat.toFixed(6), lng: center.lng.toFixed(6), radius: $("n-radius").value, limit: $("n-limit").value });
   if ($("n-species").value) q.set("pokemonId", $("n-species").value);
+  if ($("n-type").value) q.set("type", $("n-type").value);
   try {
-    const d = await api(`/${$("n-mode").value}?${q}`);
+    const d = await api(`/${$("n-mode").value}?${q}`, { key: "spawns" });
     plot(d.results);
     const far = d.results.length ? d.results[d.results.length - 1].distance_m : null;
     $("summary").innerHTML = `<b>${fmt(d.count)}</b> avistamientos a ≤ ${fmt(d.query.radius_m)} m` +
@@ -167,14 +176,16 @@ map.on(L.Draw.Event.CREATED, (e) => {
 });
 map.on(L.Draw.Event.DELETED, () => { lastPoly = null; results.clearLayers(); $("summary").innerHTML = ""; $("list").innerHTML = ""; });
 $("w-species").onchange = () => lastPoly && runWithin();
+$("w-type").onchange = () => lastPoly && runWithin();
 $("w-limit").onchange = () => lastPoly && runWithin();
 $("w-clear").onclick = () => { drawn.clearLayers(); results.clearLayers(); lastPoly = null; $("summary").innerHTML = ""; $("list").innerHTML = ""; };
 
 async function runWithin() {
   const q = new URLSearchParams({ limit: $("w-limit").value, count: "true" });
   if ($("w-species").value) q.set("pokemonId", $("w-species").value);
+  if ($("w-type").value) q.set("type", $("w-type").value);
   try {
-    const d = await api(`/within?${q}`, { method: "POST", body: lastPoly });
+    const d = await api(`/within?${q}`, { method: "POST", body: lastPoly, key: "spawns" });
     plot(d.results);
     $("summary").innerHTML = `<b>${fmt(d.total)}</b> avistamientos dentro de la zona` +
       (d.truncated ? ` <span class="warn">· se dibujan ${fmt(d.count)} (tope del límite)</span>` : "");
@@ -184,10 +195,33 @@ async function runWithin() {
 /* ---------- pestaña: hotspots + calor ---------- */
 $("h-go").onclick = loadHot;
 $("h-heat").onchange = () => { if ($("h-heat").checked) loadHeat(); else if (heat) { map.removeLayer(heat); heat = null; } };
-map.on("moveend", () => { if (tab === "hot" && $("h-heat").checked) debounce(loadHeat, 400); });
+map.on("moveend", () => { if (tab === "hot" && $("h-heat").checked && !focused) debounce(loadHeat, 400); });
+$("h-type").onchange = () => focused && showHotspot(focused);
+let focused = null, cellBox = null;
+
+/* Avistamientos de un hotspot: POST /within con el cuadrado de la celda (0,01 grados) -> $geoWithin. */
+async function showHotspot(h) {
+  focused = h;
+  if (heat) { map.removeLayer(heat); heat = null; }
+  const [lng, lat] = h.location.coordinates, d = 0.005;
+  const ring = [[lng - d, lat - d], [lng + d, lat - d], [lng + d, lat + d], [lng - d, lat + d], [lng - d, lat - d]].map((p) => p.map((v) => +v.toFixed(6)));
+  cellBox && overlay.removeLayer(cellBox);
+  cellBox = L.rectangle([[lat - d, lng - d], [lat + d, lng + d]], { color: "#c2410c", weight: 2, fill: false, dashArray: "4 4", interactive: false }).addTo(overlay);
+  map.fitBounds(cellBox.getBounds(), { padding: [30, 30], maxZoom: 18 });
+  const q = new URLSearchParams({ limit: 1000, count: "true" });
+  if ($("h-type").value) q.set("type", $("h-type").value);
+  try {
+    const r = await api(`/within?${q}`, { method: "POST", body: { type: "Polygon", coordinates: [ring] }, key: "spawns" });
+    plot(r.results);
+    $("summary").innerHTML = `<b>${fmt(r.total)}</b> avistamientos en el hotspot #${h.rank}` +
+      ($("h-type").value ? ` (tipo ${esc($("h-type").value)})` : ` en ${fmt(h.puntos_distintos)} puntos distintos`) +
+      (r.truncated ? ` <span class="warn">· se dibujan ${fmt(r.count)}</span>` : "");
+  } catch (e) { fail(e); }
+}
 let timer; const debounce = (f, ms) => { clearTimeout(timer); timer = setTimeout(f, ms); };
 
 async function loadHot() {
+  focused = null; cellBox = null; results.clearLayers();
   try {
     const d = await api(`/stats/hotspots?limit=${$("h-limit").value}`);
     overlay.clearLayers(); const list = $("list"); list.innerHTML = "";
@@ -197,13 +231,14 @@ async function loadHot() {
       const tops = h.top_species.map((s) => `${esc(s.name)} (${fmt(s.count)})`).join(", ");
       const pop = `<b>Hotspot #${h.rank}</b><br>${fmt(h.count)} avistamientos en ${fmt(h.puntos_distintos)} puntos distintos<br>` +
         `<span class="m">${h.species} especies · celda 0,01° · ${esc(h.cell_id)}</span><br>${tops}`;
-      L.marker([lat, lng], { icon: L.divIcon({ className: "", html: `<div class="hs">${h.rank}</div>`, iconSize: [26, 26] }) }).bindPopup(pop).addTo(overlay);
+      L.marker([lat, lng], { icon: L.divIcon({ className: "", html: `<div class="hs">${h.rank}</div>`, iconSize: [26, 26] }) })
+        .bindPopup(pop).on("click", () => showHotspot(h)).addTo(overlay);
       const li = document.createElement("li");
       li.innerHTML = `<span class="dot" style="background:var(--accent)"></span><span class="nm">#${h.rank} · ${esc(h.top_species[0]?.name)}</span><span class="mt">${fmt(h.count)}</span>`;
-      li.onclick = () => { map.setView([lat, lng], 15); };
+      li.onclick = () => showHotspot(h);
       list.appendChild(li);
     });
-    $("summary").innerHTML = `<b>${fmt(d.count)}</b> celdas más densas (clic en un número o en la lista)`;
+    $("summary").innerHTML = `<b>${fmt(d.count)}</b> celdas más densas (clic en un número o en la lista para ver sus avistamientos)`;
     if (pts.length) map.fitBounds(pts, { padding: [50, 50], maxZoom: 13 });
     if ($("h-heat").checked) loadHeat();
   } catch (e) { fail(e); }
@@ -213,7 +248,7 @@ async function loadHeat() {
   const b = map.getBounds();
   const q = new URLSearchParams({ limit: 500, min_lat: b.getSouth(), max_lat: b.getNorth(), min_lng: b.getWest(), max_lng: b.getEast() });
   try {
-    const d = await api(`/stats/grid?${q}`);
+    const d = await api(`/stats/grid?${q}`, { key: "heat" });
     const max = Math.max(1, ...d.results.map((c) => c.count));
     const pts = d.results.map((c) => [c.lat_c, c.lng_c, Math.sqrt(c.count / max)]);
     if (heat) map.removeLayer(heat);
@@ -283,6 +318,6 @@ async function loadRank() {
     $("health").textContent = h.status === "ok" ? "API y Mongo activos" : "Mongo caído";
     $("health").className = "health " + (h.status === "ok" ? "ok" : "bad");
   } catch { $("health").textContent = "API sin respuesta"; $("health").className = "health bad"; }
+  setTab("near");                                  // no espera al catalogo de especies
   try { await loadSpecies(); } catch (e) { fail(e); }
-  setTab("near");
 })();

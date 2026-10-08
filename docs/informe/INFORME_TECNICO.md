@@ -89,7 +89,7 @@ El job `processing/jobs/aggregate.py` lee `spawns` y `pokemon_catalog` con el co
 | `GET /stats/hotspots`, `/grid`, `/time`, `/species`, `/species/<id>/hours` | Resultados calculados con Spark. |
 | `GET /health` | Estado de la API y de MongoDB. |
 
-Cada resultado se enriquece con nombre y tipos de la especie. Límites: radio ≤ 50 km, `limit` ≤ 1.000, polígono ≤ 500 vértices, `maxTimeMS` = 8 s; los errores inesperados devuelven 500 sin filtrar detalles internos. Hay 59 pruebas unitarias de la API con una base simulada que registra la consulta exacta recibida; una prueba de mutación (invertir `[lng, lat]` en `point()`) hace fallar 2 de ellas.
+Cada resultado se enriquece con nombre y tipos de la especie. Límites: radio ≤ 50 km, `limit` ≤ 1.000, polígono ≤ 500 vértices, `maxTimeMS` = 8 s; los errores inesperados devuelven 500 sin filtrar detalles internos. Hay 67 pruebas unitarias de la API con una base simulada que registra la consulta exacta recibida; una prueba de mutación (invertir `[lng, lat]` en `point()`) hace fallar 2 de ellas.
 
 ## 7. Integración y despliegue continuo
 

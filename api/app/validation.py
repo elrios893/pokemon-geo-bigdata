@@ -84,6 +84,17 @@ def parse_pokemon_id(args, name="pokemonId"):
     return n
 
 
+def parse_type(args, valid, name="type"):
+    """Tipo de pokemon (fire, water...). `valid` = tipos que existen en el catalogo."""
+    raw = args.get(name)
+    if raw is None or raw == "":
+        return None
+    t = raw.strip().lower()
+    if t not in valid:
+        raise ValidationError(f"'{name}' debe ser uno de: {', '.join(sorted(valid))}")
+    return t
+
+
 def _position(p):
     if not isinstance(p, (list, tuple)) or len(p) != 2:
         raise ValidationError("cada posicion del poligono debe ser [lng, lat]")

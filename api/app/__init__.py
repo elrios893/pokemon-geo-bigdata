@@ -14,6 +14,13 @@ def create_app(db=None):
         db = client[os.environ.get("MONGO_DB", "pokemon")]
     app.config["DB"] = db
 
+    # Indices de las agregaciones de Spark que consulta el mapa (idempotente; si la base no los admite, se sigue sin ellos).
+    try:
+        db.agg_grid.create_index([("count", -1)])
+        db.agg_grid.create_index([("lat_c", 1), ("lng_c", 1)])
+    except Exception:  # noqa: BLE001
+        app.logger.warning("no se pudieron crear los indices de agg_grid")
+
     from .routes import bp
     app.register_blueprint(bp)
 

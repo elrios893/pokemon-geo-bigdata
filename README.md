@@ -57,13 +57,13 @@ limpia, escribe Parquet en `data/clean/` y recarga la colección. Variables úti
 ## API
 
 Todas las consultas son parametrizadas (no hay coordenadas ni radios fijos en el código); las entradas inválidas devuelven `400` con un mensaje.
-Límites: radio ≤ 50 km, `limit` ≤ 1000, polígono ≤ 500 vértices, `maxTimeMS` = 8 s. Orden GeoJSON: `[longitud, latitud]`.
+Límites: radio ≤ 50 km, `limit` ≤ 1000, `type` = tipo del catálogo (se traduce a `pokemonId $in [...]`), polígono ≤ 500 vértices, `maxTimeMS` = 8 s. Orden GeoJSON: `[longitud, latitud]`.
 
 | Endpoint | Consulta MongoDB | Parámetros |
 |---|---|---|
-| `GET /near` | `$near` (por distancia) | `lat`, `lng`, `radius` (m), `pokemonId`, `limit` |
-| `POST /within` | `$geoWithin` | cuerpo: GeoJSON `Polygon`/`Feature`; `pokemonId`, `limit`, `count=true` (añade `total`) |
-| `GET /geonear` | agregación `$geoNear` (devuelve `distance_m`) | `lat`, `lng`, `radius`, `pokemonId`, `limit` |
+| `GET /near` | `$near` (por distancia) | `lat`, `lng`, `radius` (m), `pokemonId`, `type`, `limit` |
+| `POST /within` | `$geoWithin` | cuerpo: GeoJSON `Polygon`/`Feature`; `pokemonId`, `type`, `limit`, `count=true` (añade `total`) |
+| `GET /geonear` | agregación `$geoNear` (devuelve `distance_m`) | `lat`, `lng`, `radius`, `pokemonId`, `type`, `limit` |
 | `GET /stats/hotspots` | resultados de Spark | `limit` |
 | `GET /stats/grid` | resultados de Spark | `min_lat`, `max_lat`, `min_lng`, `max_lng`, `limit` |
 | `GET /stats/time` | resultados de Spark | `granularity=hour\|dow\|day` |
@@ -93,9 +93,9 @@ Abrir <http://localhost:5000/> con el stack levantado. Es una página estática 
 
 | Pestaña | Endpoint | Qué hace |
 |---|---|---|
-| Cerca | `/near`, `/geonear` | clic o arrastre del centro, radio y especie; muestra los puntos y la distancia |
-| Zona | `POST /within?count=true` | se dibuja un polígono o rectángulo; muestra el total real y los puntos |
-| Hotspots | `/stats/hotspots`, `/stats/grid` | celdas más densas numeradas y mapa de calor del encuadre visible |
+| Cerca | `/near`, `/geonear` | clic o arrastre del centro, radio, especie y tipo; muestra los puntos y la distancia |
+| Zona | `POST /within?count=true` | se dibuja un polígono o rectángulo (filtro por especie y tipo); muestra el total real y los puntos |
+| Hotspots | `/stats/hotspots`, `/stats/grid` | celdas más densas numeradas y mapa de calor; al hacer clic en un hotspot se piden sus avistamientos con `POST /within` sobre el cuadrado de la celda |
 | Tiempo | `/stats/time`, `/stats/species`, `/stats/species/<id>/hours` | gráficas por hora, día de la semana y fecha; horas de cada especie |
 
 Cada consulta muestra, debajo, la URL exacta que se llamó (con el `curl` en los `POST`) y el JSON crudo de la respuesta.
@@ -119,7 +119,7 @@ Colección `spawns` (≈ 2,24 M de documentos con `SAMPLE_STRIDE=4`):
 ## Pruebas
 
 ```bash
-docker run --rm bigdata-api:latest python -m pytest tests -q    # 65 pruebas de la API (base simulada)
+docker run --rm bigdata-api:latest python -m pytest tests -q    # 67 pruebas de la API (base simulada)
 python -m pytest tests/unit -q                                  # 16 pruebas de limpieza, carga y muestreo (requiere las dependencias de ingest/)
 ```
 

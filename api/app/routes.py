@@ -4,7 +4,7 @@ from flask import Blueprint, current_app, jsonify, request
 
 from . import queries
 from .validation import (ValidationError, parse_flag, parse_limit, parse_lat_lng, parse_pokemon_id,
-                         parse_polygon, parse_radius)
+                         parse_polygon, parse_radius, parse_type)
 
 bp = Blueprint("api", __name__)
 MAX_TIME_MS = 8000
@@ -21,6 +21,20 @@ def _catalog():
         cache = {c["pokemonId"]: c for c in _db().pokemon_catalog.find({})}
         current_app.config["_CATALOG"] = cache
     return cache
+
+
+def _species_filter():
+    """Combina ?pokemonId= y ?type=: devuelve None (todas), un id o la lista de ids que cumplen ambos."""
+    cat = _catalog()
+    pid = parse_pokemon_id(request.args)
+    valid = {t for c in cat.values() for t in (c.get("types") or [])}
+    t = parse_type(request.args, valid)
+    if t is None:
+        return pid
+    ids = sorted(i for i, c in cat.items() if t in (c.get("types") or []))
+    if pid is not None:
+        ids = [i for i in ids if i == pid]
+    return ids
 
 
 def _spawn(doc):
@@ -57,14 +71,15 @@ def _bad_request(exc):
 
 @bp.get("/near")
 def near():
-    """GET /near?lat=&lng=&radius=[&pokemonId=][&limit=]  ->  avistamientos cercanos ($near, por distancia)."""
+    """GET /near?lat=&lng=&radius=[&pokemonId=][&type=][&limit=]  ->  avistamientos cercanos ($near, por distancia)."""
     lat, lng = parse_lat_lng(request.args)
     radius = parse_radius(request.args)
-    pid = parse_pokemon_id(request.args)
+    pid = _species_filter()
     limit = parse_limit(request.args)
     cur = _db().spawns.find(queries.near_filter(lng, lat, radius, pid)).limit(limit).max_time_ms(MAX_TIME_MS)
     results = [_spawn(d) for d in cur]
-    return jsonify(query={"lat": lat, "lng": lng, "radius_m": radius, "pokemonId": pid},
+    return jsonify(query={"lat": lat, "lng": lng, "radius_m": radius, "pokemonId": request.args.get("pokemonId", type=int),
+                          "type": request.args.get("type") or None},
                    count=len(results), results=results)
 
 
@@ -74,7 +89,7 @@ def within():
 
     Con count=true se agrega `total` (count_documents sobre el mismo filtro): `results` esta limitado, el total no."""
     polygon = parse_polygon(request.get_json(silent=True))
-    pid = parse_pokemon_id(request.args)
+    pid = _species_filter()
     limit = parse_limit(request.args)
     want_total = parse_flag(request.args, "count")
     flt = queries.within_filter(polygon, pid)
@@ -82,7 +97,7 @@ def within():
     docs = list(cur)
     truncated = len(docs) > limit
     results = [_spawn(d) for d in docs[:limit]]
-    body = {"query": {"pokemonId": pid, "vertices": len(polygon["coordinates"][0])},
+    body = {"query": {"pokemonId": request.args.get("pokemonId", type=int), "type": request.args.get("type") or None, "vertices": len(polygon["coordinates"][0])},
             "count": len(results), "truncated": truncated, "results": results}
     if want_total:
         body["total"] = _db().spawns.count_documents(flt, maxTimeMS=MAX_TIME_MS)
@@ -91,14 +106,15 @@ def within():
 
 @bp.get("/geonear")
 def geonear():
-    """GET /geonear?lat=&lng=&radius=[&pokemonId=][&limit=]  ->  como /near pero con distance_m ($geoNear)."""
+    """GET /geonear?lat=&lng=&radius=[&pokemonId=][&type=][&limit=]  ->  como /near pero con distance_m ($geoNear)."""
     lat, lng = parse_lat_lng(request.args)
     radius = parse_radius(request.args)
-    pid = parse_pokemon_id(request.args)
+    pid = _species_filter()
     limit = parse_limit(request.args)
     pipeline = queries.geonear_pipeline(lng, lat, radius, pid, limit)
     results = [_spawn(d) for d in _db().spawns.aggregate(pipeline, maxTimeMS=MAX_TIME_MS)]
-    return jsonify(query={"lat": lat, "lng": lng, "radius_m": radius, "pokemonId": pid},
+    return jsonify(query={"lat": lat, "lng": lng, "radius_m": radius, "pokemonId": request.args.get("pokemonId", type=int),
+                          "type": request.args.get("type") or None},
                    count=len(results), results=results)
 
 

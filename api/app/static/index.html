@@ -33,6 +33,7 @@
           </label>
           <label>Especie <select id="n-species" class="species"></select></label>
         </div>
+        <label>Tipo <select id="n-type" class="types"></select></label>
         <label>Radio <output id="n-radius-o">500 m</output>
           <input id="n-radius" type="range" min="50" max="5000" step="50" value="500">
         </label>
@@ -47,8 +48,9 @@
         <p class="hint">Dibuja un polígono o rectángulo con las herramientas del mapa (arriba a la izquierda).</p>
         <div class="row">
           <label>Especie <select id="w-species" class="species"></select></label>
-          <label>Límite <input id="w-limit" type="number" min="1" max="1000" value="300"></label>
+          <label>Tipo <select id="w-type" class="types"></select></label>
         </div>
+        <label>Límite <input id="w-limit" type="number" min="1" max="1000" value="300"></label>
         <button id="w-clear" class="ghost">Borrar zona</button>
       </section>
 
@@ -56,8 +58,10 @@
         <p class="hint">Resultados precalculados por Spark sobre toda la muestra.</p>
         <div class="row">
           <label>Hotspots <input id="h-limit" type="number" min="1" max="200" value="30"></label>
-          <label class="check"><input id="h-heat" type="checkbox" checked> Mapa de calor</label>
+          <label>Tipo (al abrir un hotspot) <select id="h-type" class="types"></select></label>
         </div>
+        <label class="check"><input id="h-heat" type="checkbox" checked> Mapa de calor</label>
+        <p class="hint">Haz clic en un número del mapa o de la lista: se muestran los avistamientos de esa celda.</p>
         <button id="h-go" class="go">Cargar hotspots</button>
       </section>
 
