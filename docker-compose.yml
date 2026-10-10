@@ -1,5 +1,5 @@
 # Sistema completo: MongoDB + Spark + Dask + API Flask + Jenkins
-# Levantar:  docker compose up -d --build
+# Levantar TODO con un comando:  docker compose up -d --build --wait   (la primera vez descarga, limpia, carga y agrega: ~15 min)
 # Presupuesto de memoria (~6,5 GB) pensado para Docker Desktop con ~8 GB.
 name: bigdata-geo
 
@@ -70,12 +70,13 @@ services:
     command: ["dask", "worker", "tcp://dask-scheduler:8786", "--nthreads", "2", "--memory-limit", "1GB", "--name", "worker-2"]
 
   # ---------- Ingesta (un solo uso): descarga -> limpieza con Dask (Parquet) -> carga a MongoDB ----------
-  # Uso:  docker compose --profile ingest run --rm ingest
+  # Corre dentro de `docker compose up -d --wait`. ensure_data.py la omite si MongoDB ya tiene los datos.
+  # Forzar recarga:  docker compose run --rm -e FORCE_INGEST=1 ingest
   ingest:
     <<: *dask-image
     container_name: ingest
-    profiles: ["ingest"]
-    command: ["sh", "-c", "python download.py && python clean.py && python load_mongo.py"]
+    restart: "no"
+    command: ["python", "ensure_data.py"]
     environment:
       DASK_SCHEDULER: tcp://dask-scheduler:8786
       RAW_DIR: /data/raw
@@ -145,14 +146,20 @@ services:
     mem_limit: 1536m
 
   # ---------- Job de Spark (un solo uso): agregaciones espaciales y temporales ----------
-  # Uso:  docker compose --profile spark run --rm spark-job
+  # Corre despues de la ingesta, dentro de `docker compose up -d --wait`. La marca data/.agg_done evita repetirlo;
+  # ensure_data.py la borra si hubo carga nueva. Recalcular a mano:  rm data/.agg_done && docker compose up -d --wait
   # El driver corre aqui (modo client); el conector de Mongo se baja con --packages (cache en data/ivy).
   spark-job:
     image: apache/spark:3.5.3
-    profiles: ["spark"]
+    container_name: spark-job
+    restart: "no"
+    user: root          # escribe la marca en el volumen ./data
     entrypoint: ["sh", "-c"]
     command:
       - >-
+        if [ -f /data/.agg_done ]; then
+        echo "[spark] agregaciones ya calculadas (borra data/.agg_done para recalcular)";
+        else
         /opt/spark/bin/spark-submit
         --master spark://spark-master:7077
         --packages org.mongodb.spark:mongo-spark-connector_2.12:10.4.0
@@ -161,7 +168,8 @@ services:
         --conf spark.driver.bindAddress=0.0.0.0
         --conf spark.driver.memory=512m
         --conf spark.executor.memory=768m
-        /opt/jobs/jobs/aggregate.py
+        /opt/jobs/jobs/aggregate.py && touch /data/.agg_done;
+        fi
     environment:
       MONGO_URI: mongodb://${MONGO_USER}:${MONGO_PASSWORD}@mongo:27017/?authSource=admin
       MONGO_DB: ${MONGO_DB:-pokemon}
@@ -174,8 +182,11 @@ services:
         condition: service_started
       spark-worker:
         condition: service_started
+      ingest:
+        condition: service_completed_successfully
     volumes:
       - ./processing:/opt/jobs:ro
+      - ./data:/data
       - ./data/ivy:/tmp/ivy
     mem_limit: 1024m
 
@@ -233,6 +244,8 @@ services:
     depends_on:
       mongo:
         condition: service_healthy
+      spark-job:
+        condition: service_completed_successfully   # la API sube cuando los datos y las agregaciones estan listos
     ports:
       - "5000:5000"
     mem_limit: 256m

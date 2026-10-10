@@ -47,6 +47,9 @@ class FakeCollection:
         self.calls.append({"count_filter": flt, **k})
         return 1234
 
+    def create_index(self, keys, **k):
+        self.calls.append({"create_index": keys})
+
     def aggregate(self, pipeline, **k):
         if self.error:
             raise self.error

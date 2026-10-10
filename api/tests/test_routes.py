@@ -159,3 +159,10 @@ def test_filtro_por_tipo_se_traduce_a_ids_del_catalogo(client, db):
 def test_tipo_invalido_devuelve_400(client):
     r = client.get("/near?lat=40.758&lng=-73.9855&radius=500&type=laser")
     assert r.status_code == 400 and "type" in r.get_json()["error"]
+
+
+def test_stats_grid_reasegura_indices_como_maximo_una_vez_por_minuto(client, db):
+    client.get("/stats/grid")
+    client.get("/stats/grid")
+    creados = [c for c in db.agg_grid.calls if "create_index" in c]
+    assert len(creados) == 2          # count y (lat_c, lng_c), una sola vez aunque haya dos peticiones
