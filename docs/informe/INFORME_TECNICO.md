@@ -39,16 +39,17 @@ Seis componentes (diez contenedores) en una sola red de Docker Compose (`bigdata
 | API con ≥ 3 endpoints | `api/app/routes.py` (sección 6) |
 | Jenkins con webhook, pytest, humo y despliegue condicionado | `Jenkinsfile` (sección 7) |
 | Dask frente a Spark con mediciones propias | `benchmark/` (sección 8) |
+| Mapa con Leaflet (opcional) | interfaz web servida por la API (sección 6) |
 | Sin secretos en el repositorio | `.env` ignorado; solo `.env.example` versionado |
 
 ## 3. Ingesta y limpieza (Dask)
 
-La descarga (`ingest/download.py`) baja los 4 ZIP, valida cada archivo y omite lo ya descargado. Se usan las URL adjuntas del foro del dataset en Kaggle, no la API de Kaggle, porque los archivos solo existen allí. La limpieza (`ingest/clean.py`) lee cada archivo por bloques de 200.000 líneas como tareas de Dask, aplica reglas puras (`ingest/cleaning.py`, con pruebas unitarias), deduplica globalmente y escribe Parquet. Antes se perfiló el dataset completo (`ingest/profile_data.py`) para fundamentar cada regla:
+La descarga (`ingest/download.py`) baja los 4 ZIP, valida cada archivo y omite lo ya descargado. Se usan las URL adjuntas del foro del dataset en Kaggle, no la API de Kaggle, porque los archivos solo existen allí. La limpieza (`ingest/clean.py`) parte cada archivo en rangos de 200.000 líneas y cada rango es una tarea de Dask: 12 tareas por archivo, 48 en total, repartidas entre los 2 workers. Cada tarea lee solo 1 de cada 4 líneas de su rango (50.000; ver Muestreo) y aplica reglas puras (`ingest/cleaning.py`, con pruebas unitarias). Después se deduplica globalmente con un *shuffle* en 8 particiones (`split_out=8`, para que un solo worker no cargue con todo) y se escriben 8 archivos Parquet. Antes se perfiló el dataset completo (`ingest/profile_data.py`) para fundamentar cada regla:
 
 | Regla | Filas afectadas (dataset completo) | Justificación |
 |---|---|---|
 | Coordenadas nulas, no numéricas, fuera de rango o (0,0) | 0 | Se implementa como defensa; el perfilado muestra 100 % de coordenadas válidas y se reporta que no elimina nada. |
-| Descartar filas sin `pokemonId` (o fuera de 1–151) | 3.993 (0,045 %) | Sin la especie no se puede enriquecer ni agregar por especie. |
+| Descartar filas sin `pokemonId` (o fuera de 1–151) | 3.993 (0,045 %) | Sin la especie no se puede enriquecer ni agregar por especie. El rango 1–151 es la primera generación, la única del lanzamiento de 2016, y coincide con la numeración del catálogo de PokeAPI. En la parte 1 (2.242.211 filas) ningún id queda fuera de rango (mín. 1, máx. 149, 145 especies): lo que se descarta son filas sin `pokemonId`. |
 | Deduplicar por (`pokemonId`, lng, lat, fecha UTC) | 11.940 (0,133 %) | Mismo evento reportado dos veces; no hay `_id` repetidos, así que no es un artefacto de las partes. |
 | Aplanar fechas extendidas de Mongo (`$date`, `$oid`) | — | Convertir a datetime UTC e identificador de texto. |
 | No usar `localTime` del dataset como hora local | — | Verificado que no es hora local: Nueva York aparece en UTC−5 en septiembre (real UTC−4) y Ámsterdam en UTC+0 (real +2). Se deriva: UTC + round(lng × 4) minutos. |
@@ -56,7 +57,7 @@ La descarga (`ingest/download.py`) baja los 4 ZIP, valida cada archivo y omite l
 
 **Muestreo.** El dataset completo con MongoDB, imágenes y volúmenes no cabe cómodamente en el equipo, y el enunciado permite una muestra de ≥ 1 M de registros si la descarga completa está automatizada. Se toma una de cada 4 líneas (`SAMPLE_STRIDE=4`): 2.241.212 líneas leídas → 1.007 sin `pokemonId` → 735 duplicados → **2.239.470 documentos**. La primera versión tomaba las primeras 500.000 filas de cada archivo; al medir la población completa se vio que sesgaba el calendario (viernes: 0,7 % de la muestra frente a 7,4 % real). El muestreo sistemático conserva esa distribución.
 
-**Carga.** Cada worker de Dask inserta su partición con `insert_many` (`ordered=False`, tolerando claves duplicadas, por lo que es idempotente). Los workers reciben la URI de MongoDB por variable de entorno, de modo que la clave no viaja por el grafo de tareas.
+**Carga.** Cada una de las 8 particiones Parquet es una tarea de Dask: el worker que la recibe abre su propia conexión e inserta con `insert_many` en lotes de 10.000 (`ordered=False`, tolerando claves duplicadas, por lo que es idempotente). Se cargaron 2.239.470 documentos con 0 duplicados de `_id`, y los índices se crean al final, con los datos ya cargados. Los workers reciben la URI de MongoDB por variable de entorno, de modo que la clave no viaja por el grafo de tareas.
 
 ## 4. Modelo de datos y consultas geoespaciales
 
@@ -75,7 +76,7 @@ Son mediciones únicas que varían con la caché; sirven como orden de magnitud 
 
 ## 5. Procesamiento con Spark
 
-El job `processing/jobs/aggregate.py` lee `spawns` y `pokemon_catalog` con el conector oficial y escribe seis colecciones: `agg_grid` (conteo, especies y puntos distintos por celda de 0,01° ≈ 1,1 km; 244.738 celdas), `agg_hotspots` (las 200 celdas más densas con sus tres especies dominantes), `agg_time` (por hora local, día de la semana y fecha), `agg_species`, `agg_species_hour` y `agg_type`. El identificador de cada documento es determinista, de modo que volver a ejecutar sobrescribe sin duplicar.
+El job `processing/jobs/aggregate.py` lee `spawns` y `pokemon_catalog` con el conector oficial y escribe seis colecciones: `agg_grid` (conteo, especies y puntos distintos por celda de 0,01° ≈ 1,1 km; 244.738 celdas), `agg_hotspots` (las 200 celdas más densas con sus tres especies dominantes), `agg_time` (por hora local, día de la semana y fecha), `agg_species`, `agg_species_hour` y `agg_type`. El identificador de cada documento es determinista, de modo que volver a ejecutar sobrescribe sin duplicar. La API crea al arrancar dos índices sobre `agg_grid` (`count` y centro de celda): bajaron la consulta del mapa de calor de 0,33 s a 0,03 s.
 
 **Verificación.** El propio job comprueba (`assert`) que el total de documentos coincide con la suma de la grilla, de las horas y de las especies (2.239.470). Además, los resultados se contrastaron con agregaciones hechas directamente en MongoDB, sin Spark, con cero diferencias. Por ejemplo, la celda más densa (Central Park, Nueva York) tiene 5.269 avistamientos en 982 puntos distintos, y el conteo independiente de puntos distintos da 982. La hora local pico es las 10 h.
 
@@ -89,11 +90,17 @@ El job `processing/jobs/aggregate.py` lee `spawns` y `pokemon_catalog` con el co
 | `GET /stats/hotspots`, `/grid`, `/time`, `/species`, `/species/<id>/hours` | Resultados calculados con Spark. |
 | `GET /health` | Estado de la API y de MongoDB. |
 
-Cada resultado se enriquece con nombre y tipos de la especie. Límites: radio ≤ 50 km, `limit` ≤ 1.000, polígono ≤ 500 vértices, `maxTimeMS` = 8 s; los errores inesperados devuelven 500 sin filtrar detalles internos. Hay 67 pruebas unitarias de la API con una base simulada que registra la consulta exacta recibida; una prueba de mutación (invertir `[lng, lat]` en `point()`) hace fallar 2 de ellas.
+Los tres endpoints espaciales aceptan también `type` (p. ej. `water`): el tipo no está en `spawns`, así que la API lo traduce a los `pokemonId` de ese tipo según el catálogo (`pokemonId $in [...]`); un tipo desconocido devuelve 400. Cada resultado se enriquece con nombre y tipos de la especie. Límites: radio ≤ 50 km, `limit` ≤ 1.000, polígono ≤ 500 vértices, `maxTimeMS` = 8 s; los errores inesperados devuelven 500 sin filtrar detalles internos. Hay 67 pruebas unitarias de la API con una base simulada que registra la consulta exacta recibida; una prueba de mutación (invertir `[lng, lat]` en `point()`) hace fallar 2 de ellas.
+
+**Interfaz web.** La misma API Flask sirve una página estática (`/`) con Leaflet que consume los endpoints anteriores y muestra, bajo cada consulta, la URL llamada y el JSON crudo. Tiene cuatro pestañas: *Cerca* (`/near` y `/geonear`, con filtro por especie y tipo), *Zona* (polígono dibujado → `POST /within`, con el total real), *Hotspots* (celdas de Spark y mapa de calor; al elegir una celda se piden sus avistamientos con `POST /within` sobre su cuadrado) y *Tiempo* (gráficas de `/stats/*`). Leaflet y las fuentes viajan en la imagen, sin CDN; solo el mapa base (OpenStreetMap) requiere internet.
+
+<img src="../img/interfaz.png" width="470" alt="Interfaz web">
+
+*Figura 2. Interfaz web: zona dibujada sobre Manhattan, avistamientos dentro y JSON de la API.*
 
 ## 7. Integración y despliegue continuo
 
-El `Jenkinsfile` declarativo tiene siete etapas: checkout, validación de los compose, construcción de imágenes, pruebas unitarias de la API (59) y de la ingesta (16), stack efímero (`docker-compose.ci.yml`: MongoDB en memoria y la API, sin puertos publicados) con 18 pruebas de humo contra una base real, y despliegue. Cada etapa depende de la anterior; el despliegue es la última, así que un fallo previo lo omite. Se despliega la misma imagen que pasó las pruebas (se re-etiqueta) y solo el servicio `api`, sin tocar MongoDB ni sus datos.
+El `Jenkinsfile` declarativo tiene siete etapas: checkout, validación de los compose, construcción de imágenes, pruebas unitarias de la API (67) y de la ingesta (16), stack efímero (`docker-compose.ci.yml`: MongoDB en memoria y la API, sin puertos publicados) con 18 pruebas de humo contra una base real, y despliegue. Cada etapa depende de la anterior; el despliegue es la última, así que un fallo previo lo omite. Se despliega la misma imagen que pasó las pruebas (se re-etiqueta) y solo el servicio `api`, sin tocar MongoDB ni sus datos.
 
 - **Disparo.** El job `pokemon-geo-bigdata` construye `main` y se dispara con el webhook de GitHub (vía smee.io). Verificado: el merge de un PR a `main` inició el build solo («Started by GitHub push»), pasó todas las etapas y desplegó la API.
 - **Un fallo bloquea el despliegue.** Se introdujo un test roto a propósito en una rama de prueba: falló con «1 failed, 58 passed» y las etapas de ingesta, humo y despliegue quedaron omitidas («skipped due to earlier failure»).
@@ -113,7 +120,7 @@ El `Jenkinsfile` declarativo tiene siete etapas: checkout, validación de los co
 
 ![Tiempo y memoria de la agregación por grilla](../../benchmark/results/benchmark.png)
 
-*Figura 2. Tiempo (mediana) y memoria de la agregación por grilla.*
+*Figura 3. Tiempo (mediana) y memoria de la agregación por grilla.*
 
 **Qué muestran los resultados.**
 
@@ -168,6 +175,7 @@ El `Jenkinsfile` declarativo tiene siete etapas: checkout, validación de los co
 - MongoDB Spark Connector 10.4: <https://www.mongodb.com/docs/spark-connector/v10.4/>
 - Dask, `dd.Aggregation` (patrón probado y descartado por lento): <https://docs.dask.org/en/stable/generated/dask.dataframe.Aggregation.html>
 - Apache Spark 3.5.3, métricas de ejecutores: <https://spark.apache.org/docs/3.5.3/monitoring.html>
+- Interfaz web: Leaflet 1.9.4 (<https://leafletjs.com/>), Leaflet.heat (<https://github.com/Leaflet/Leaflet.heat>) y Leaflet.draw (<https://github.com/Leaflet/Leaflet.draw>); tipografía Geist (<https://github.com/vercel/geist-font>); mapa base © OpenStreetMap (<https://www.openstreetmap.org/copyright>).
 - smee.io y smee-client: <https://smee.io/>
 - Mermaid (diagramas): <https://mermaid.js.org/>
 - Imágenes oficiales de Docker Hub: `mongo`, `apache/spark`, `jenkins/jenkins`, `python`.
