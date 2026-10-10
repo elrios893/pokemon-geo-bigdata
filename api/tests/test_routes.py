@@ -168,6 +168,12 @@ def test_stats_grid_reasegura_indices_como_maximo_una_vez_por_minuto(client, db)
     assert len(creados) == 2          # count y (lat_c, lng_c), una sola vez aunque haya dos peticiones
 
 
+def test_stats_types(client):
+    r = client.get("/stats/types")
+    body = r.get_json()
+    assert r.status_code == 200 and body["count"] == 1 and body["results"][0]["type"] == "water"
+
+
 def test_ping(client):
     r = client.get("/ping")
     assert r.status_code == 200 and r.get_json() == {"pong": True}
