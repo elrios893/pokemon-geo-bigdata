@@ -7511,7 +7511,7 @@ a.anchor-link {
 <!-- End of mermaid configuration --></head>
 <body class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
 <main>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=849082af">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=900efee1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7534,30 +7534,42 @@ y los resultados del benchmark salen de <code>benchmark/results/</code>.</p>
 </tr>
 <tr>
 <td>2</td>
-<td>Datos y limpieza (Dask)</td>
+<td>De la URL al dato crudo (descarga y primeras filas)</td>
 </tr>
 <tr>
 <td>3</td>
-<td>Modelo GeoJSON e índice 2dsphere</td>
+<td>El catálogo de especies (PokeAPI) y la unión por <code>pokemonId</code></td>
 </tr>
 <tr>
 <td>4</td>
-<td>Consultas geoespaciales: <code>$near</code>, <code>$geoWithin</code>, <code>$geoNear</code></td>
+<td>¿Por qué <code>pokemonId</code> va de 1 a 151?</td>
 </tr>
 <tr>
 <td>5</td>
-<td>Agregaciones de Spark y su verificación</td>
+<td>Limpieza (Dask)</td>
 </tr>
 <tr>
 <td>6</td>
-<td>API Flask</td>
+<td>Modelo GeoJSON e índice 2dsphere</td>
 </tr>
 <tr>
 <td>7</td>
-<td>Dask frente a Spark</td>
+<td>Consultas geoespaciales: <code>$near</code>, <code>$geoWithin</code>, <code>$geoNear</code></td>
 </tr>
 <tr>
 <td>8</td>
+<td>Agregaciones de Spark y su verificación</td>
+</tr>
+<tr>
+<td>9</td>
+<td>API Flask</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Dask frente a Spark</td>
+</tr>
+<tr>
+<td>11</td>
 <td>CI/CD con Jenkins</td>
 </tr>
 </tbody>
@@ -7565,7 +7577,7 @@ y los resultados del benchmark salen de <code>benchmark/results/</code>.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=ae274023">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=ea77a7f3">
 <div class="jp-Cell-outputWrapper">
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
@@ -7579,7 +7591,7 @@ y los resultados del benchmark salen de <code>benchmark/results/</code>.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a581545f">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c5d63493">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7589,7 +7601,7 @@ agregaciones (Spark) → API Flask</strong>, y Jenkins reconstruye y despliega l
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=678edf32">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=0527e053">
 <div class="jp-Cell-outputWrapper">
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
@@ -7601,7 +7613,7 @@ agregaciones (Spark) → API Flask</strong>, y Jenkins reconstruye y despliega l
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=8ab64410">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=af77d9d2">
 <div class="jp-Cell-outputWrapper">
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
@@ -7636,61 +7648,61 @@ agregaciones (Spark) → API Flask</strong>, y Jenkins reconstruye y despliega l
 <th>3</th>
 <td>api</td>
 <td>bigdata-api:latest</td>
-<td>Up About a minute (healthy)</td>
+<td>Up 3 minutes (healthy)</td>
 </tr>
 <tr>
 <th>2</th>
 <td>dask-scheduler</td>
 <td>bigdata-ingest:latest</td>
-<td>Up About a minute (healthy)</td>
+<td>Up 2 minutes (healthy)</td>
 </tr>
 <tr>
 <th>1</th>
 <td>dask-worker-1</td>
 <td>bigdata-ingest:latest</td>
-<td>Up 51 seconds</td>
+<td>Up 2 minutes</td>
 </tr>
 <tr>
 <th>0</th>
 <td>dask-worker-2</td>
 <td>bigdata-ingest:latest</td>
-<td>Up 51 seconds</td>
+<td>Up 2 minutes</td>
 </tr>
 <tr>
 <th>6</th>
 <td>jenkins</td>
 <td>bigdata-jenkins:latest</td>
-<td>Up About a minute</td>
+<td>Up 3 minutes</td>
 </tr>
 <tr>
 <th>8</th>
 <td>mongo</td>
 <td>mongo:7.0</td>
-<td>Up About a minute (healthy)</td>
+<td>Up 3 minutes (healthy)</td>
 </tr>
 <tr>
 <th>7</th>
 <td>smee</td>
 <td>node:20-alpine</td>
-<td>Up About a minute</td>
+<td>Up 3 minutes</td>
 </tr>
 <tr>
 <th>9</th>
 <td>spark-master</td>
 <td>apache/spark:3.5.3</td>
-<td>Up About a minute</td>
+<td>Up 3 minutes</td>
 </tr>
 <tr>
 <th>4</th>
 <td>spark-worker</td>
 <td>apache/spark:3.5.3</td>
-<td>Up About a minute</td>
+<td>Up 3 minutes</td>
 </tr>
 <tr>
 <th>5</th>
 <td>spark-worker-2</td>
 <td>apache/spark:3.5.3</td>
-<td>Up About a minute</td>
+<td>Up 3 minutes</td>
 </tr>
 </tbody>
 </table>
@@ -7700,12 +7712,687 @@ agregaciones (Spark) → API Flask</strong>, y Jenkins reconstruye y despliega l
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8ed63385">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=528b16d0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="2.-Datos-y-limpieza-con-Dask">2. Datos y limpieza con Dask<a class="anchor-link" href="#2.-Datos-y-limpieza-con-Dask">¶</a></h2><ul>
+<h2 id="2.-De-la-URL-al-dato-crudo">2. De la URL al dato crudo<a class="anchor-link" href="#2.-De-la-URL-al-dato-crudo">¶</a></h2><p>El dataset se descarga <strong>por URL</strong> (los adjuntos públicos de la discusión de Kaggle del dataset <em>Predict'em All</em>). <code>ingest/download.py</code> baja las 4 partes;
+aquí se trae <strong>solo la parte 1</strong> para ver cómo viene el dato antes de limpiarlo.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=cec07fc5">
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>catchemall_part1.zip: 58 MB comprimido → catchemall_part1.json, 524 MB descomprimido
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7e10f1d0">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="C%C3%B3mo-viene-una-fila-(cruda)">Cómo viene una fila (cruda)<a class="anchor-link" href="#C%C3%B3mo-viene-una-fila-(cruda)">¶</a></h3><p>Cada línea es un documento JSON (formato <em>NDJSON</em>, exportado de MongoDB: por eso <code>$oid</code> y <code>$date</code>).</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=79c18084">
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>{
+  "localTime": "07:26:25",
+  "source": "POKESNIPER",
+  "appearedOn": {
+    "$date": "2016-09-21T12:26:25.000Z"
+  },
+  "pokemonId": 134,
+  "_id": {
+    "$oid": "57e27f5d4856fa0012d30faa"
+  },
+  "location": {
+    "coordinates": [
+      -73.972765,
+      40.77907
+    ],
+    "type": "Point"
+  },
+  "__v": 0
+}
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=694df6d5">
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>localTime</th>
+<th>source</th>
+<th>pokemonId</th>
+<th>__v</th>
+<th>appearedOn</th>
+<th>_id</th>
+<th>location.coordinates</th>
+<th>location.type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>07:26:25</td>
+<td>POKESNIPER</td>
+<td>134</td>
+<td>0</td>
+<td>2016-09-21T12:26:25.000Z</td>
+<td>57e27f5d4856fa0012d30faa</td>
+<td>[-73.972765, 40.77907]</td>
+<td>Point</td>
+</tr>
+<tr>
+<th>1</th>
+<td>20:26:34</td>
+<td>POKESNIPER</td>
+<td>127</td>
+<td>0</td>
+<td>2016-09-21T12:26:34.000Z</td>
+<td>57e27f5d4856fa0012d30fab</td>
+<td>[114.18959, 22.28216]</td>
+<td>Point</td>
+</tr>
+<tr>
+<th>2</th>
+<td>06:27:17</td>
+<td>POKESNIPER</td>
+<td>143</td>
+<td>0</td>
+<td>2016-09-21T12:27:17.000Z</td>
+<td>57e27f5d4856fa0012d30fac</td>
+<td>[-97.43708, 20.545455]</td>
+<td>Point</td>
+</tr>
+<tr>
+<th>3</th>
+<td>12:27:49</td>
+<td>POKESNIPER</td>
+<td>97</td>
+<td>0</td>
+<td>2016-09-21T12:27:49.000Z</td>
+<td>57e27f5d4856fa0012d30fad</td>
+<td>[6.904019, 46.312507]</td>
+<td>Point</td>
+</tr>
+<tr>
+<th>4</th>
+<td>04:27:55</td>
+<td>POKESNIPER</td>
+<td>138</td>
+<td>0</td>
+<td>2016-09-21T12:27:55.000Z</td>
+<td>57e27f5d4856fa0012d30fae</td>
+<td>[-118.499762, 34.010078]</td>
+<td>Point</td>
+</tr>
+<tr>
+<th>5</th>
+<td>20:28:12</td>
+<td>POKESNIPER</td>
+<td>12</td>
+<td>0</td>
+<td>2016-09-21T12:28:12.000Z</td>
+<td>57e27f5d4856fa0012d30faf</td>
+<td>[114.031657, 22.205482]</td>
+<td>Point</td>
+</tr>
+<tr>
+<th>6</th>
+<td>07:28:49</td>
+<td>POKESNIPER</td>
+<td>61</td>
+<td>0</td>
+<td>2016-09-21T12:28:49.000Z</td>
+<td>57e27f5d4856fa0012d30fb0</td>
+<td>[-73.986171, 40.768474]</td>
+<td>Point</td>
+</tr>
+<tr>
+<th>7</th>
+<td>19:28:53</td>
+<td>POKESNIPER</td>
+<td>85</td>
+<td>0</td>
+<td>2016-09-21T12:28:53.000Z</td>
+<td>57e27f5d4856fa0012d30fb1</td>
+<td>[106.681773, -6.145948]</td>
+<td>Point</td>
+</tr>
+<tr>
+<th>8</th>
+<td>12:29:34</td>
+<td>POKESNIPER</td>
+<td>70</td>
+<td>0</td>
+<td>2016-09-21T12:29:34.000Z</td>
+<td>57e27f5d4856fa0012d30fb2</td>
+<td>[2.144449, 41.398224]</td>
+<td>Point</td>
+</tr>
+<tr>
+<th>9</th>
+<td>20:29:38</td>
+<td>POKESNIPER</td>
+<td>33</td>
+<td>0</td>
+<td>2016-09-21T12:29:38.000Z</td>
+<td>57e27f5d4856fa0012d30fb3</td>
+<td>[121.752894, 24.68102]</td>
+<td>Point</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b2103992">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><strong>Qué se ve:</strong></p>
+<ul>
+<li>La especie viene solo como número: <code>pokemonId</code> (134, 127, 143…). <strong>No trae el nombre ni el tipo.</strong></li>
+<li>La ubicación ya es un <code>Point</code> de GeoJSON con <code>[longitud, latitud]</code>.</li>
+<li><code>localTime</code> no es hora local real (se calcula una hora local propia a partir de UTC y la longitud; ver informe).</li>
+<li><code>__v</code> y <code>_id.$oid</code> son restos de MongoDB y no se conservan.</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=29335fa2">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="3.-El-cat%C3%A1logo-de-especies-(PokeAPI)">3. El catálogo de especies (PokeAPI)<a class="anchor-link" href="#3.-El-cat%C3%A1logo-de-especies-(PokeAPI)">¶</a></h2><p>Para ponerle nombre y tipo a cada <code>pokemonId</code> se construye un <strong>catálogo</strong> con <a href="https://pokeapi.co/">PokeAPI</a>: 151 consultas, <strong>una sola vez</strong>, guardadas en
+<code>data/catalog/pokemon_catalog.json</code> y cargadas a MongoDB (<code>pokemon_catalog</code>). La API Flask nunca vuelve a llamar a PokeAPI.
+Primero, cómo responde PokeAPI para un solo Pokémon (aquí el id 134, el primero de las filas de arriba):</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=e8e697f3">
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>sin acceso a PokeAPI: ConnectionError → se usa la copia local de la misma respuesta
+copia local: la respuesta trae 21 campos y pesa 307 KB; algunos:
+{'id': 134, 'name': 'vaporeon', 'height': 10, 'weight': 290, 'base_experience': 184} | tipos: ['water']
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3f0f41f2">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>La respuesta completa es enorme (movimientos, sprites, juegos). <code>ingest/build_pokemon_catalog.py</code> se queda solo con lo útil: <strong>id, nombre, tipos, altura, peso y estadísticas base</strong>.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=66f5bd5f">
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>151 especies en el catálogo (pokemonId 1–151)
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>pokemonId</th>
+<th>name</th>
+<th>types</th>
+<th>height</th>
+<th>weight</th>
+<th>base_experience</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>1</td>
+<td>bulbasaur</td>
+<td>grass / poison</td>
+<td>7</td>
+<td>69</td>
+<td>64</td>
+</tr>
+<tr>
+<th>1</th>
+<td>2</td>
+<td>ivysaur</td>
+<td>grass / poison</td>
+<td>10</td>
+<td>130</td>
+<td>142</td>
+</tr>
+<tr>
+<th>2</th>
+<td>3</td>
+<td>venusaur</td>
+<td>grass / poison</td>
+<td>20</td>
+<td>1000</td>
+<td>236</td>
+</tr>
+<tr>
+<th>3</th>
+<td>4</td>
+<td>charmander</td>
+<td>fire</td>
+<td>6</td>
+<td>85</td>
+<td>62</td>
+</tr>
+<tr>
+<th>4</th>
+<td>5</td>
+<td>charmeleon</td>
+<td>fire</td>
+<td>11</td>
+<td>190</td>
+<td>142</td>
+</tr>
+<tr>
+<th>5</th>
+<td>6</td>
+<td>charizard</td>
+<td>fire / flying</td>
+<td>17</td>
+<td>905</td>
+<td>240</td>
+</tr>
+<tr>
+<th>6</th>
+<td>7</td>
+<td>squirtle</td>
+<td>water</td>
+<td>5</td>
+<td>90</td>
+<td>63</td>
+</tr>
+<tr>
+<th>7</th>
+<td>8</td>
+<td>wartortle</td>
+<td>water</td>
+<td>10</td>
+<td>225</td>
+<td>142</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=919a5c07">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="Asignar-nombre-y-tipo-a-las-filas-(uni%C3%B3n-por-pokemonId)">Asignar nombre y tipo a las filas (unión por <code>pokemonId</code>)<a class="anchor-link" href="#Asignar-nombre-y-tipo-a-las-filas-(uni%C3%B3n-por-pokemonId)">¶</a></h3>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=609d9ec2">
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>aparecio_utc</th>
+<th>pokemonId</th>
+<th>name</th>
+<th>types</th>
+<th>source</th>
+<th>lng</th>
+<th>lat</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>2016-09-21T12:26:25.000Z</td>
+<td>134</td>
+<td>vaporeon</td>
+<td>water</td>
+<td>POKESNIPER</td>
+<td>-73.972765</td>
+<td>40.779070</td>
+</tr>
+<tr>
+<th>1</th>
+<td>2016-09-21T12:26:34.000Z</td>
+<td>127</td>
+<td>pinsir</td>
+<td>bug</td>
+<td>POKESNIPER</td>
+<td>114.189590</td>
+<td>22.282160</td>
+</tr>
+<tr>
+<th>2</th>
+<td>2016-09-21T12:27:17.000Z</td>
+<td>143</td>
+<td>snorlax</td>
+<td>normal</td>
+<td>POKESNIPER</td>
+<td>-97.437080</td>
+<td>20.545455</td>
+</tr>
+<tr>
+<th>3</th>
+<td>2016-09-21T12:27:49.000Z</td>
+<td>97</td>
+<td>hypno</td>
+<td>psychic</td>
+<td>POKESNIPER</td>
+<td>6.904019</td>
+<td>46.312507</td>
+</tr>
+<tr>
+<th>4</th>
+<td>2016-09-21T12:27:55.000Z</td>
+<td>138</td>
+<td>omanyte</td>
+<td>rock / water</td>
+<td>POKESNIPER</td>
+<td>-118.499762</td>
+<td>34.010078</td>
+</tr>
+<tr>
+<th>5</th>
+<td>2016-09-21T12:28:12.000Z</td>
+<td>12</td>
+<td>butterfree</td>
+<td>bug / flying</td>
+<td>POKESNIPER</td>
+<td>114.031657</td>
+<td>22.205482</td>
+</tr>
+<tr>
+<th>6</th>
+<td>2016-09-21T12:28:49.000Z</td>
+<td>61</td>
+<td>poliwhirl</td>
+<td>water</td>
+<td>POKESNIPER</td>
+<td>-73.986171</td>
+<td>40.768474</td>
+</tr>
+<tr>
+<th>7</th>
+<td>2016-09-21T12:28:53.000Z</td>
+<td>85</td>
+<td>dodrio</td>
+<td>normal / flying</td>
+<td>POKESNIPER</td>
+<td>106.681773</td>
+<td>-6.145948</td>
+</tr>
+<tr>
+<th>8</th>
+<td>2016-09-21T12:29:34.000Z</td>
+<td>70</td>
+<td>weepinbell</td>
+<td>grass / poison</td>
+<td>POKESNIPER</td>
+<td>2.144449</td>
+<td>41.398224</td>
+</tr>
+<tr>
+<th>9</th>
+<td>2016-09-21T12:29:38.000Z</td>
+<td>33</td>
+<td>nidorino</td>
+<td>poison</td>
+<td>POKESNIPER</td>
+<td>121.752894</td>
+<td>24.681020</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=70729472">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>Esta unión es la que hace la API en cada respuesta (<code>name</code> y <code>types</code> salen de la colección <code>pokemon_catalog</code>, que se carga en memoria una vez).</p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e2185fc4">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="4.-%C2%BFPor-qu%C3%A9-pokemonId-va-de-1-a-151?">4. ¿Por qué <code>pokemonId</code> va de 1 a 151?<a class="anchor-link" href="#4.-%C2%BFPor-qu%C3%A9-pokemonId-va-de-1-a-151?">¶</a></h2><p>El número 151 sale de <strong>dos hechos</strong>, y se puede comprobar con los datos:</p>
+<ol>
+<li><strong>El juego:</strong> Pokémon GO se lanzó en 2016 solo con la <strong>primera generación</strong> (Kanto), que son los Pokémon del 1 al 151 de la Pokédex nacional.</li>
+<li><strong>PokeAPI usa esa misma numeración</strong>, así que el <code>pokemonId</code> del dataset es directamente el id del catálogo.</li>
+</ol>
+<p>La regla de limpieza (<code>MIN_ID, MAX_ID = 1, 151</code> en <code>ingest/cleaning.py</code>) es una <strong>validación del dominio</strong>: un <code>pokemonId</code> fuera de ese rango no se podría enriquecer con el catálogo.
+Veamos si el dato la necesita; se recorren las ~2,2 M filas de la parte 1:</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=a5add1ee">
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>2,242,211 filas leídas en 23 s
+pokemonId mínimo = 1, máximo = 149, especies distintas = 145
+filas con id fuera de 1–151: 0 | filas sin pokemonId: 972
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=dbd4d11b">
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>145 de 151 especies aparecen en la parte 1. Las que nunca aparecen:
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>pokemonId</th>
+<th>name</th>
+<th>types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>131</th>
+<td>132</td>
+<td>ditto</td>
+<td>normal</td>
+</tr>
+<tr>
+<th>143</th>
+<td>144</td>
+<td>articuno</td>
+<td>ice / flying</td>
+</tr>
+<tr>
+<th>144</th>
+<td>145</td>
+<td>zapdos</td>
+<td>electric / flying</td>
+</tr>
+<tr>
+<th>145</th>
+<td>146</td>
+<td>moltres</td>
+<td>fire / flying</td>
+</tr>
+<tr>
+<th>149</th>
+<td>150</td>
+<td>mewtwo</td>
+<td>psychic</td>
+</tr>
+<tr>
+<th>150</th>
+<td>151</td>
+<td>mew</td>
+<td>psychic</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=14501fad">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><strong>Conclusión:</strong> en este dato <strong>no hay ids fuera de 1–151</strong>; lo único que la regla descarta son las filas <strong>sin <code>pokemonId</code></strong> (unas 1.000 en la muestra de 2,2 M).
+El límite superior es una protección por si llegara un id que el catálogo no conoce, y el 1–151 de la API se valida igual (<code>400</code> si piden la especie 999).
+Las 6 que nunca aparecen son Ditto, las tres aves legendarias, Mewtwo y Mew: especies que no se encontraban como avistamientos salvajes normales en 2016. Por eso hay 145 especies en los datos y 151 en el catálogo.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f2600d7d">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="5.-Datos-y-limpieza-con-Dask">5. Datos y limpieza con Dask<a class="anchor-link" href="#5.-Datos-y-limpieza-con-Dask">¶</a></h2><ul>
 <li><strong>Fuente:</strong> dataset «Catch Them All» (avistamientos de Pokémon GO, 2016): 4 archivos NDJSON, <strong>8.964.844 registros</strong> en total.</li>
 <li><strong>Muestra:</strong> se toma 1 de cada 4 líneas (muestreo sistemático). El dataset completo se descarga siempre; la muestra se controla con <code>SAMPLE_STRIDE</code>.</li>
 <li><strong>Reglas de limpieza</strong>, aplicadas por partición con Dask: coordenadas inválidas, falta de <code>pokemonId</code>, fecha inválida y duplicados globales.</li>
@@ -7713,7 +8400,7 @@ agregaciones (Spark) → API Flask</strong>, y Jenkins reconstruye y despliega l
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=d613215e">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=57ef1f5f">
 <div class="jp-Cell-outputWrapper">
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
@@ -7792,16 +8479,16 @@ agregaciones (Spark) → API Flask</strong>, y Jenkins reconstruye y despliega l
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5aabfdc7">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=77a6afb1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="3.-Modelo-GeoJSON-e-%C3%ADndice-2dsphere">3. Modelo GeoJSON e índice 2dsphere<a class="anchor-link" href="#3.-Modelo-GeoJSON-e-%C3%ADndice-2dsphere">¶</a></h2><p>Cada avistamiento es un documento con <code>location</code> como <strong>GeoJSON <code>Point</code></strong>. El orden es <code>[longitud, latitud]</code>, al revés de lo que se suele escribir.</p>
+<h2 id="6.-Modelo-GeoJSON-e-%C3%ADndice-2dsphere">6. Modelo GeoJSON e índice 2dsphere<a class="anchor-link" href="#6.-Modelo-GeoJSON-e-%C3%ADndice-2dsphere">¶</a></h2><p>Cada avistamiento es un documento con <code>location</code> como <strong>GeoJSON <code>Point</code></strong>. El orden es <code>[longitud, latitud]</code>, al revés de lo que se suele escribir.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=7feabdef">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=169f30ff">
 <div class="jp-Cell-outputWrapper">
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
@@ -7829,7 +8516,7 @@ agregaciones (Spark) → API Flask</strong>, y Jenkins reconstruye y despliega l
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=c77b46bc">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=485f60b4">
 <div class="jp-Cell-outputWrapper">
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
@@ -7845,34 +8532,34 @@ pokemonId_1          [('pokemonId', 1)]
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f8607494">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1c7d4999">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="4.-Consultas-geoespaciales">4. Consultas geoespaciales<a class="anchor-link" href="#4.-Consultas-geoespaciales">¶</a></h2><p>Las tres reciben <strong>parámetros</strong> (nada de coordenadas fijas en el código). Centro de las pruebas: Times Square, <code>lat=40.758</code>, <code>lng=-73.9855</code>.</p>
+<h2 id="7.-Consultas-geoespaciales">7. Consultas geoespaciales<a class="anchor-link" href="#7.-Consultas-geoespaciales">¶</a></h2><p>Las tres reciben <strong>parámetros</strong> (nada de coordenadas fijas en el código). Centro de las pruebas: Times Square, <code>lat=40.758</code>, <code>lng=-73.9855</code>.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=211d5f79">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=2cb0621b">
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9a08ec02">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b1c53071">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="4.1-$near-%E2%80%94-por-radio,-ordenado-del-m%C3%A1s-cercano-al-m%C3%A1s-lejano">4.1 <code>$near</code> — por radio, ordenado del más cercano al más lejano<a class="anchor-link" href="#4.1-$near-%E2%80%94-por-radio,-ordenado-del-m%C3%A1s-cercano-al-m%C3%A1s-lejano">¶</a></h3>
+<h3 id="7.1-$near-%E2%80%94-por-radio,-ordenado-del-m%C3%A1s-cercano-al-m%C3%A1s-lejano">7.1 <code>$near</code> — por radio, ordenado del más cercano al más lejano<a class="anchor-link" href="#7.1-$near-%E2%80%94-por-radio,-ordenado-del-m%C3%A1s-cercano-al-m%C3%A1s-lejano">¶</a></h3>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=78444b9f">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=2ccba709">
 <div class="jp-Cell-outputWrapper">
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>5 resultados en 5 ms
+<pre>5 resultados en 14 ms
 118 [-73.985619, 40.758286]
 16 [-73.98562, 40.758286]
 12 [-73.98562, 40.758286]
@@ -7886,23 +8573,23 @@ Usa el índice 2dsphere: True | documentos examinados: 241 de 2,239,470
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=03f6e434">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=418a4684">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="4.2-$geoWithin-%E2%80%94-dentro-de-un-pol%C3%ADgono-(aqu%C3%AD,-un-rect%C3%A1ngulo-sobre-Manhattan)">4.2 <code>$geoWithin</code> — dentro de un polígono (aquí, un rectángulo sobre Manhattan)<a class="anchor-link" href="#4.2-$geoWithin-%E2%80%94-dentro-de-un-pol%C3%ADgono-(aqu%C3%AD,-un-rect%C3%A1ngulo-sobre-Manhattan)">¶</a></h3>
+<h3 id="7.2-$geoWithin-%E2%80%94-dentro-de-un-pol%C3%ADgono-(aqu%C3%AD,-un-rect%C3%A1ngulo-sobre-Manhattan)">7.2 <code>$geoWithin</code> — dentro de un polígono (aquí, un rectángulo sobre Manhattan)<a class="anchor-link" href="#7.2-$geoWithin-%E2%80%94-dentro-de-un-pol%C3%ADgono-(aqu%C3%AD,-un-rect%C3%A1ngulo-sobre-Manhattan)">¶</a></h3>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=0c134d99">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=453632d6">
 <div class="jp-Cell-outputWrapper">
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>40,152 avistamientos dentro del polígono (233 ms)
+<pre>40,152 avistamientos dentro del polígono (376 ms)
 </pre>
 </div>
 </div>
@@ -7964,16 +8651,16 @@ Usa el índice 2dsphere: True | documentos examinados: 241 de 2,239,470
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=daf2a350">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=857ee556">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="4.3-$geoNear-%E2%80%94-agregaci%C3%B3n-que-devuelve-la-distancia-calculada">4.3 <code>$geoNear</code> — agregación que devuelve la distancia calculada<a class="anchor-link" href="#4.3-$geoNear-%E2%80%94-agregaci%C3%B3n-que-devuelve-la-distancia-calculada">¶</a></h3>
+<h3 id="7.3-$geoNear-%E2%80%94-agregaci%C3%B3n-que-devuelve-la-distancia-calculada">7.3 <code>$geoNear</code> — agregación que devuelve la distancia calculada<a class="anchor-link" href="#7.3-$geoNear-%E2%80%94-agregaci%C3%B3n-que-devuelve-la-distancia-calculada">¶</a></h3>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=f5e62bcc">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=0e16af54">
 <div class="jp-Cell-outputWrapper">
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
@@ -8036,7 +8723,7 @@ Usa el índice 2dsphere: True | documentos examinados: 241 de 2,239,470
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=102cc50d">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=aba67835">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8046,17 +8733,17 @@ Usa el índice 2dsphere: True | documentos examinados: 241 de 2,239,470
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=aa61a7ad">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5ef3010d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="5.-Agregaciones-de-Spark">5. Agregaciones de Spark<a class="anchor-link" href="#5.-Agregaciones-de-Spark">¶</a></h2><p>Spark lee <code>spawns</code> desde MongoDB con el <em>MongoDB Spark Connector</em> y escribe colecciones nuevas <code>agg_*</code>: grilla de 0,01° (~1,1 km), hotspots (top 200),
+<h2 id="8.-Agregaciones-de-Spark">8. Agregaciones de Spark<a class="anchor-link" href="#8.-Agregaciones-de-Spark">¶</a></h2><p>Spark lee <code>spawns</code> desde MongoDB con el <em>MongoDB Spark Connector</em> y escribe colecciones nuevas <code>agg_*</code>: grilla de 0,01° (~1,1 km), hotspots (top 200),
 conteos por hora/día de la semana/fecha y por especie.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=aaee6f76">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=75b31073">
 <div class="jp-Cell-outputWrapper">
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
@@ -8184,7 +8871,7 @@ conteos por hora/día de la semana/fecha y por especie.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=007c9686">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=9cb638bf">
 <div class="jp-Cell-outputWrapper">
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
@@ -8197,7 +8884,7 @@ conteos por hora/día de la semana/fecha y por especie.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b3949d6f">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1f1d2bb0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8206,7 +8893,7 @@ conteos por hora/día de la semana/fecha y por especie.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=06313ed6">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=74fdeb3a">
 <div class="jp-Cell-outputWrapper">
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
@@ -8220,16 +8907,16 @@ conteos por hora/día de la semana/fecha y por especie.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7318804e">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e551bb33">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="6.-API-Flask">6. API Flask<a class="anchor-link" href="#6.-API-Flask">¶</a></h2><p>Cada endpoint, con código de estado y tiempo. Los de <code>/stats/*</code> leen lo que calculó Spark; los demás consultan <code>spawns</code> en vivo.</p>
+<h2 id="9.-API-Flask">9. API Flask<a class="anchor-link" href="#9.-API-Flask">¶</a></h2><p>Cada endpoint, con código de estado y tiempo. Los de <code>/stats/*</code> leen lo que calculó Spark; los demás consultan <code>spawns</code> en vivo.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=ea42a012">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=94668d3d">
 <div class="jp-Cell-outputWrapper">
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
@@ -8267,7 +8954,7 @@ conteos por hora/día de la semana/fecha y por especie.</p>
 <td>GET</td>
 <td>/health</td>
 <td>200</td>
-<td>8 ms</td>
+<td>10 ms</td>
 <td>ok</td>
 </tr>
 <tr>
@@ -8275,7 +8962,7 @@ conteos por hora/día de la semana/fecha y por especie.</p>
 <td>GET</td>
 <td>/near?lat=40.758&amp;lng=-73.9855&amp;radius=500&amp;limit=3</td>
 <td>200</td>
-<td>12 ms</td>
+<td>13 ms</td>
 <td>3</td>
 </tr>
 <tr>
@@ -8283,7 +8970,7 @@ conteos por hora/día de la semana/fecha y por especie.</p>
 <td>POST</td>
 <td>/within?count=true&amp;limit=3</td>
 <td>200</td>
-<td>244 ms</td>
+<td>329 ms</td>
 <td>3</td>
 </tr>
 <tr>
@@ -8291,7 +8978,7 @@ conteos por hora/día de la semana/fecha y por especie.</p>
 <td>GET</td>
 <td>/geonear?lat=40.758&amp;lng=-73.9855&amp;radius=500&amp;li...</td>
 <td>200</td>
-<td>34 ms</td>
+<td>54 ms</td>
 <td>3</td>
 </tr>
 <tr>
@@ -8299,7 +8986,7 @@ conteos por hora/día de la semana/fecha y por especie.</p>
 <td>GET</td>
 <td>/near?lat=40.758&amp;lng=-73.9855&amp;radius=500&amp;type=...</td>
 <td>200</td>
-<td>10 ms</td>
+<td>12 ms</td>
 <td>3</td>
 </tr>
 <tr>
@@ -8307,7 +8994,7 @@ conteos por hora/día de la semana/fecha y por especie.</p>
 <td>GET</td>
 <td>/stats/hotspots?limit=3</td>
 <td>200</td>
-<td>16 ms</td>
+<td>9 ms</td>
 <td>3</td>
 </tr>
 <tr>
@@ -8315,7 +9002,7 @@ conteos por hora/día de la semana/fecha y por especie.</p>
 <td>GET</td>
 <td>/stats/grid?limit=3</td>
 <td>200</td>
-<td>7 ms</td>
+<td>17 ms</td>
 <td>3</td>
 </tr>
 <tr>
@@ -8323,7 +9010,7 @@ conteos por hora/día de la semana/fecha y por especie.</p>
 <td>GET</td>
 <td>/stats/time?granularity=hour</td>
 <td>200</td>
-<td>7 ms</td>
+<td>9 ms</td>
 <td>24</td>
 </tr>
 <tr>
@@ -8331,7 +9018,7 @@ conteos por hora/día de la semana/fecha y por especie.</p>
 <td>GET</td>
 <td>/stats/species?limit=3</td>
 <td>200</td>
-<td>7 ms</td>
+<td>10 ms</td>
 <td>3</td>
 </tr>
 <tr>
@@ -8339,7 +9026,7 @@ conteos por hora/día de la semana/fecha y por especie.</p>
 <td>GET</td>
 <td>/stats/species/25/hours</td>
 <td>200</td>
-<td>9 ms</td>
+<td>12 ms</td>
 <td>24</td>
 </tr>
 </tbody>
@@ -8349,7 +9036,7 @@ conteos por hora/día de la semana/fecha y por especie.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=114ab3ad">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=7b169334">
 <div class="jp-Cell-outputWrapper">
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
@@ -8367,17 +9054,17 @@ polígono abierto          → 400 cada anillo necesita al menos 4 posiciones (e
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4d24e87e">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1098e000">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="7.-Dask-frente-a-Spark">7. Dask frente a Spark<a class="anchor-link" href="#7.-Dask-frente-a-Spark">¶</a></h2><p>Operación: <strong>agregación por celda de grilla de 0,01°</strong> (conteo y especies distintas por celda), sobre el mismo Parquet. Dos configuraciones por motor
+<h2 id="10.-Dask-frente-a-Spark">10. Dask frente a Spark<a class="anchor-link" href="#10.-Dask-frente-a-Spark">¶</a></h2><p>Operación: <strong>agregación por celda de grilla de 0,01°</strong> (conteo y especies distintas por celda), sobre el mismo Parquet. Dos configuraciones por motor
 (2 y 4 núcleos), 3 repeticiones medidas, y mediana. Los resultados coinciden entre motores (mismas celdas y mismo total).</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=360e9bc9">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=1c042f20">
 <div class="jp-Cell-outputWrapper">
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
@@ -8386,15 +9073,15 @@ polígono abierto          → 400 cada anillo necesita al menos 4 posiciones (e
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <style type="text/css">
 </style>
-<table id="T_c30f2">
+<table id="T_f0ea4">
 <caption>Mediana de tiempo (s)</caption>
 <thead>
 <tr>
 <th class="index_name level0">config</th>
-<th class="col_heading level0 col0" id="T_c30f2_level0_col0">dask 2 núcleos</th>
-<th class="col_heading level0 col1" id="T_c30f2_level0_col1">dask 4 núcleos</th>
-<th class="col_heading level0 col2" id="T_c30f2_level0_col2">spark 2 núcleos</th>
-<th class="col_heading level0 col3" id="T_c30f2_level0_col3">spark 4 núcleos</th>
+<th class="col_heading level0 col0" id="T_f0ea4_level0_col0">dask 2 núcleos</th>
+<th class="col_heading level0 col1" id="T_f0ea4_level0_col1">dask 4 núcleos</th>
+<th class="col_heading level0 col2" id="T_f0ea4_level0_col2">spark 2 núcleos</th>
+<th class="col_heading level0 col3" id="T_f0ea4_level0_col3">spark 4 núcleos</th>
 </tr>
 <tr>
 <th class="index_name level0">filas</th>
@@ -8406,25 +9093,25 @@ polígono abierto          → 400 cada anillo necesita al menos 4 posiciones (e
 </thead>
 <tbody>
 <tr>
-<th class="row_heading level0 row0" id="T_c30f2_level0_row0">560006</th>
-<td class="data row0 col0" id="T_c30f2_row0_col0">1.20</td>
-<td class="data row0 col1" id="T_c30f2_row0_col1">0.92</td>
-<td class="data row0 col2" id="T_c30f2_row0_col2">1.88</td>
-<td class="data row0 col3" id="T_c30f2_row0_col3">1.90</td>
+<th class="row_heading level0 row0" id="T_f0ea4_level0_row0">560006</th>
+<td class="data row0 col0" id="T_f0ea4_row0_col0">1.20</td>
+<td class="data row0 col1" id="T_f0ea4_row0_col1">0.92</td>
+<td class="data row0 col2" id="T_f0ea4_row0_col2">1.88</td>
+<td class="data row0 col3" id="T_f0ea4_row0_col3">1.90</td>
 </tr>
 <tr>
-<th class="row_heading level0 row1" id="T_c30f2_level0_row1">1120489</th>
-<td class="data row1 col0" id="T_c30f2_row1_col0">1.84</td>
-<td class="data row1 col1" id="T_c30f2_row1_col1">1.35</td>
-<td class="data row1 col2" id="T_c30f2_row1_col2">2.50</td>
-<td class="data row1 col3" id="T_c30f2_row1_col3">3.31</td>
+<th class="row_heading level0 row1" id="T_f0ea4_level0_row1">1120489</th>
+<td class="data row1 col0" id="T_f0ea4_row1_col0">1.84</td>
+<td class="data row1 col1" id="T_f0ea4_row1_col1">1.35</td>
+<td class="data row1 col2" id="T_f0ea4_row1_col2">2.50</td>
+<td class="data row1 col3" id="T_f0ea4_row1_col3">3.31</td>
 </tr>
 <tr>
-<th class="row_heading level0 row2" id="T_c30f2_level0_row2">2239470</th>
-<td class="data row2 col0" id="T_c30f2_row2_col0">3.54</td>
-<td class="data row2 col1" id="T_c30f2_row2_col1">2.11</td>
-<td class="data row2 col2" id="T_c30f2_row2_col2">4.03</td>
-<td class="data row2 col3" id="T_c30f2_row2_col3">4.56</td>
+<th class="row_heading level0 row2" id="T_f0ea4_level0_row2">2239470</th>
+<td class="data row2 col0" id="T_f0ea4_row2_col0">3.54</td>
+<td class="data row2 col1" id="T_f0ea4_row2_col1">2.11</td>
+<td class="data row2 col2" id="T_f0ea4_row2_col2">4.03</td>
+<td class="data row2 col3" id="T_f0ea4_row2_col3">4.56</td>
 </tr>
 </tbody>
 </table>
@@ -8434,15 +9121,15 @@ polígono abierto          → 400 cada anillo necesita al menos 4 posiciones (e
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <style type="text/css">
 </style>
-<table id="T_86336">
+<table id="T_b5140">
 <caption>Pico de memoria de los workers (MB)</caption>
 <thead>
 <tr>
 <th class="index_name level0">config</th>
-<th class="col_heading level0 col0" id="T_86336_level0_col0">dask 2 núcleos</th>
-<th class="col_heading level0 col1" id="T_86336_level0_col1">dask 4 núcleos</th>
-<th class="col_heading level0 col2" id="T_86336_level0_col2">spark 2 núcleos</th>
-<th class="col_heading level0 col3" id="T_86336_level0_col3">spark 4 núcleos</th>
+<th class="col_heading level0 col0" id="T_b5140_level0_col0">dask 2 núcleos</th>
+<th class="col_heading level0 col1" id="T_b5140_level0_col1">dask 4 núcleos</th>
+<th class="col_heading level0 col2" id="T_b5140_level0_col2">spark 2 núcleos</th>
+<th class="col_heading level0 col3" id="T_b5140_level0_col3">spark 4 núcleos</th>
 </tr>
 <tr>
 <th class="index_name level0">filas</th>
@@ -8454,25 +9141,25 @@ polígono abierto          → 400 cada anillo necesita al menos 4 posiciones (e
 </thead>
 <tbody>
 <tr>
-<th class="row_heading level0 row0" id="T_86336_level0_row0">560006</th>
-<td class="data row0 col0" id="T_86336_row0_col0">235</td>
-<td class="data row0 col1" id="T_86336_row0_col1">432</td>
-<td class="data row0 col2" id="T_86336_row0_col2">519</td>
-<td class="data row0 col3" id="T_86336_row0_col3">955</td>
+<th class="row_heading level0 row0" id="T_b5140_level0_row0">560006</th>
+<td class="data row0 col0" id="T_b5140_row0_col0">235</td>
+<td class="data row0 col1" id="T_b5140_row0_col1">432</td>
+<td class="data row0 col2" id="T_b5140_row0_col2">519</td>
+<td class="data row0 col3" id="T_b5140_row0_col3">955</td>
 </tr>
 <tr>
-<th class="row_heading level0 row1" id="T_86336_level0_row1">1120489</th>
-<td class="data row1 col0" id="T_86336_row1_col0">262</td>
-<td class="data row1 col1" id="T_86336_row1_col1">480</td>
-<td class="data row1 col2" id="T_86336_row1_col2">646</td>
-<td class="data row1 col3" id="T_86336_row1_col3">1116</td>
+<th class="row_heading level0 row1" id="T_b5140_level0_row1">1120489</th>
+<td class="data row1 col0" id="T_b5140_row1_col0">262</td>
+<td class="data row1 col1" id="T_b5140_row1_col1">480</td>
+<td class="data row1 col2" id="T_b5140_row1_col2">646</td>
+<td class="data row1 col3" id="T_b5140_row1_col3">1116</td>
 </tr>
 <tr>
-<th class="row_heading level0 row2" id="T_86336_level0_row2">2239470</th>
-<td class="data row2 col0" id="T_86336_row2_col0">298</td>
-<td class="data row2 col1" id="T_86336_row2_col1">537</td>
-<td class="data row2 col2" id="T_86336_row2_col2">682</td>
-<td class="data row2 col3" id="T_86336_row2_col3">1239</td>
+<th class="row_heading level0 row2" id="T_b5140_level0_row2">2239470</th>
+<td class="data row2 col0" id="T_b5140_row2_col0">298</td>
+<td class="data row2 col1" id="T_b5140_row2_col1">537</td>
+<td class="data row2 col2" id="T_b5140_row2_col2">682</td>
+<td class="data row2 col3" id="T_b5140_row2_col3">1239</td>
 </tr>
 </tbody>
 </table>
@@ -8486,7 +9173,7 @@ polígono abierto          → 400 cada anillo necesita al menos 4 posiciones (e
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a57d869f">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=facc2f70">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8501,12 +9188,12 @@ polígono abierto          → 400 cada anillo necesita al menos 4 posiciones (e
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5a1caed6">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=92ba9187">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="8.-CI/CD-con-Jenkins">8. CI/CD con Jenkins<a class="anchor-link" href="#8.-CI/CD-con-Jenkins">¶</a></h2><p>Un <code>push</code> a <code>main</code> llega a Jenkins por el webhook de GitHub (puente <code>smee</code>). El <code>Jenkinsfile</code>, versionado en el repositorio, ejecuta:</p>
+<h2 id="11.-CI/CD-con-Jenkins">11. CI/CD con Jenkins<a class="anchor-link" href="#11.-CI/CD-con-Jenkins">¶</a></h2><p>Un <code>push</code> a <code>main</code> llega a Jenkins por el webhook de GitHub (puente <code>smee</code>). El <code>Jenkinsfile</code>, versionado en el repositorio, ejecuta:</p>
 <table>
 <thead>
 <tr>
@@ -8552,20 +9239,20 @@ polígono abierto          → 400 cada anillo necesita al menos 4 posiciones (e
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=78a8ff1a">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=75540f48">
 <div class="jp-Cell-outputWrapper">
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>imagen: bigdata-api:latest  |  creado: 2026-10-08T02:44:07.783432518Z  |  arrancó: 2026-10-08T21:26:50.631770706Z
+<pre>imagen: bigdata-api:latest  |  creado: 2026-10-08T02:44:07.783432518Z  |  arrancó: 2026-10-10T03:59:01.250407558Z
 
+3582b7b docs: cuaderno de sustentacion con datos reales y respaldo en HTML
 dcbfba9 Merge pull request #16 from elrios893/feat/ui
 cbda249 feat(ui): filtro por tipo, avistamientos al abrir un hotspot y consultas mas rapidas (indices en agg_grid, canvas, cancelacion de consultas)
 e9053b2 feat(ui): interfaz web con mapa Leaflet sobre la API (near, within, hotspots, tiempo) y JSON crudo
 787e979 Merge pull request #15 from elrios893/docs/final
-781157b Merge pull request #14 from elrios893/feat/benchmark
 
 </pre>
 </div>
