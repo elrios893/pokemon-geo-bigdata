@@ -172,3 +172,8 @@ def test_stats_types(client):
     r = client.get("/stats/types")
     body = r.get_json()
     assert r.status_code == 200 and body["count"] == 1 and body["results"][0]["type"] == "water"
+
+
+def test_ping(client):
+    r = client.get("/ping")
+    assert r.status_code == 200 and r.get_json() == {"pong": True}

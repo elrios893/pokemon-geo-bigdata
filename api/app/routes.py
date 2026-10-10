@@ -85,6 +85,12 @@ def _bad_request(exc):
     return jsonify(error=str(exc)), 400
 
 
+@bp.get("/ping")
+def ping():
+    """GET /ping  ->  respuesta fija; sirve para ensayar el flujo rama -> PR -> merge -> Jenkins."""
+    return jsonify(pong=True)
+
+
 @bp.get("/near")
 def near():
     """GET /near?lat=&lng=&radius=[&pokemonId=][&type=][&limit=]  ->  avistamientos cercanos ($near, por distancia)."""
