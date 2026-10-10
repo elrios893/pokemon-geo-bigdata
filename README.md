@@ -43,10 +43,14 @@ Requisitos: Docker con Compose v2 y conexión a internet. Nada más (Python no h
 git clone https://github.com/elrios893/pokemon-geo-bigdata.git && cd pokemon-geo-bigdata
 cp .env.example .env            # editar MONGO_PASSWORD (el archivo .env NO se versiona)
 
-docker compose up -d --build                          # mongo, dask, spark, api, jenkins
-docker compose --profile ingest run --rm ingest       # descarga -> limpieza (Dask) -> carga a MongoDB (≈ 10–15 min con la descarga)
-docker compose --profile spark run --rm spark-job     # agregaciones de Spark -> colecciones agg_* (≈ 2 min)
+docker compose up -d --build --wait     # UN comando: levanta todo, ingiere los datos y calcula las agregaciones
 ```
+
+Ese único comando, en orden: servicios base (MongoDB, Dask, Spark) → `ingest` (descarga → limpieza con Dask → carga a MongoDB) → `spark-job` (agregaciones → colecciones `agg_*`) → `api` y Jenkins. La API solo arranca cuando los datos y las agregaciones están listos; `--wait` devuelve el control en ese momento.
+La primera vez tarda ≈ 15 min (descarga de 1,2 GB incluida). **Las siguientes veces tarda segundos**: `ingest` y `spark-job` se omiten si MongoDB ya tiene los datos (índice 2dsphere creado = carga completa) y existe la marca `data/.agg_done`.
+
+Opcional, para el webhook de GitHub: `docker compose --profile webhook up -d` (requiere `SMEE_URL` en `.env`).
+Recalcular a mano: `docker compose run --rm -e FORCE_INGEST=1 ingest` (recarga los datos) o `rm data/.agg_done && docker compose up -d --wait` (solo las agregaciones).
 
 Comprobación: `curl localhost:5000/health` → `{"status":"ok","mongo":"up"}`.
 
@@ -119,8 +123,8 @@ Colección `spawns` (≈ 2,24 M de documentos con `SAMPLE_STRIDE=4`):
 ## Pruebas
 
 ```bash
-docker run --rm bigdata-api:latest python -m pytest tests -q    # 67 pruebas de la API (base simulada)
-python -m pytest tests/unit -q                                  # 16 pruebas de limpieza, carga y muestreo (requiere las dependencias de ingest/)
+docker run --rm bigdata-api:latest python -m pytest tests -q    # 68 pruebas de la API (base simulada)
+python -m pytest tests/unit -q                                  # 21 pruebas de limpieza, carga, muestreo y arranque (requiere las dependencias de ingest/)
 ```
 
 Las pruebas de humo (18 comprobaciones contra un MongoDB real efímero) las ejecuta el pipeline: `tests/smoke/smoke_api.py`.

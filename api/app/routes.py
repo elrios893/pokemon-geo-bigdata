@@ -1,3 +1,4 @@
+import time
 from datetime import datetime
 
 from flask import Blueprint, current_app, jsonify, request
@@ -12,6 +13,21 @@ MAX_TIME_MS = 8000
 
 def _db():
     return current_app.config["DB"]
+
+
+def _ensure_grid_indexes():
+    """Asegura los indices de agg_grid (idempotente). El job de Spark sobrescribe la coleccion y los borra, por eso se
+    reasegura como maximo una vez por minuto en vez de solo al arrancar la API."""
+    cfg = current_app.config
+    now = time.monotonic()
+    if now - cfg.get("_GRID_IDX_AT", -1e9) < 60:
+        return
+    cfg["_GRID_IDX_AT"] = now
+    try:
+        _db().agg_grid.create_index([("count", -1)])
+        _db().agg_grid.create_index([("lat_c", 1), ("lng_c", 1)])
+    except Exception:  # noqa: BLE001  (sin permisos o base falsa: se sigue sin indices)
+        current_app.logger.warning("no se pudieron crear los indices de agg_grid")
 
 
 def _catalog():
@@ -144,6 +160,7 @@ def stats_grid():
                     raise ValidationError(f"'{key}' debe ser numerico")
         if rng:
             flt[field] = rng
+    _ensure_grid_indexes()
     docs = _db().agg_grid.find(flt).sort("count", -1).limit(limit).max_time_ms(MAX_TIME_MS)
     return _listing(docs)
 
