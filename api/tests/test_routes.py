@@ -166,3 +166,9 @@ def test_stats_grid_reasegura_indices_como_maximo_una_vez_por_minuto(client, db)
     client.get("/stats/grid")
     creados = [c for c in db.agg_grid.calls if "create_index" in c]
     assert len(creados) == 2          # count y (lat_c, lng_c), una sola vez aunque haya dos peticiones
+
+
+def test_stats_types(client):
+    r = client.get("/stats/types")
+    body = r.get_json()
+    assert r.status_code == 200 and body["count"] == 1 and body["results"][0]["type"] == "water"

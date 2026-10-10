@@ -175,6 +175,12 @@ def stats_time():
     return _listing(docs, extra={"granularity": g})
 
 
+@bp.get("/stats/types")
+def stats_types():
+    """GET /stats/types  ->  avistamientos por tipo de Pokemon (agg_type, calculado por Spark)."""
+    return _listing(_db().agg_type.find({}).sort("count", -1))
+
+
 @bp.get("/stats/species")
 def stats_species():
     """GET /stats/species[?limit=]  ->  especies por numero de avistamientos."""

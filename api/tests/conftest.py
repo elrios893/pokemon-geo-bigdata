@@ -84,6 +84,7 @@ class FakeDB:
         self.agg_grid = FakeCollection([{"_id": "c", "cell_id": "c", "count": 10, "lat_c": 40.7, "lng_c": -74.0}])
         self.agg_time = FakeCollection([{"_id": "hour:07", "granularity": "hour", "key": "07", "count": 63238}])
         self.agg_species = FakeCollection([{"_id": 16, "pokemonId": 16, "name": "pidgey", "count": 5}])
+        self.agg_type = FakeCollection([{"_id": "water", "type": "water", "count": 10}])
         self.agg_species_hour = FakeCollection([{"_id": "16:7", "pokemonId": 16, "local_hour": 7, "count": 3}])
 
 
